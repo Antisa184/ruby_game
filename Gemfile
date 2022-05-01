@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
-gem 'tty'
+gem 'tty-prompt'
+gem 'tty-reader'
 
 # gem "rails"

@@ -1,4 +1,5 @@
 require "tty-prompt"
+require "tty-reader"
 class Game
   Dir["lib/*.rb"].each {|file| require_relative file }
   def initialize
@@ -12,6 +13,18 @@ class Game
   prompt = TTY::Prompt.new
   prompt.yes?("Do you like Ruby?")
 
+
   reader = TTY::Reader.new
-  reader.on(:keyup)
+  loop do
+    puts "\e[H\e[2J"
+    States::Base.game
+    key=reader.read_keypress
+    keypress=reader.on(:keyescape) do
+      puts "Escape"
+      States::Base.main_menu
+      keypress2=reader.on(:keyescape) do
+        States::Base.game
+      end
+    end
+  end
 end
