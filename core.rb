@@ -24,9 +24,11 @@ class Game
   @@objects.append(NPC::Enemy.new("Đuro", 29, 10, 5, 2, 35, [], false, "E", "asdf", 3))
   @@objects.append(NPC::Enemy.new("Đuro", 27, 20, 5, 2, 35, [], false, "E", "asdf", 3))
 
+  @@objects.append(NPC::EnemyBoss.new("Đurisimus", 15, 35, 25, 12, 75, [], false, "Đ", "asdf", 1))
+
   map = Map::Base.new("mapa", 71, 30, [], nil)
   @@objects.each do |item|
-    if item.is_a?(NPC::Enemy)
+    if item.is_a?(NPC::Enemy) or item.is_a?(NPC::EnemyBoss)
       x=item.pos_x.to_i
       y=item.pos_y.to_i
     else
@@ -60,7 +62,7 @@ class Game
     States::Base.game(player)
     puts("↑,↓,←,→ - Move around, I - Inventory, Esc - Main Menu")
     puts("Player position: "+player.pos_x.to_s+","+player.pos_y.to_s)
-    puts("Health: "+player.health.to_s+", Level: "+player.level.to_s+", XP: "+player.xp.to_s)
+    puts("Health: "+player.health.to_s+", Level: "+player.level.to_s+", XP: "+player.xp.to_s+", DMG: "+player.damage.to_s+", Gold: "+player.inventory.gold.to_s)
     #puts States::Base.objects_near
     key=reader.read_keypress
     keypress=reader.on(:keyescape) do
@@ -88,6 +90,59 @@ class Game
       krv_ti_jebem=0
       player.move_to(new_x, new_y+1)
     end
+
+    keypress=reader.on(:keypress) do |event|
+      #if krv_ti_jebem!=0 then next end
+      if event.value == "i" and krv_ti_jebem==0
+        temp_dict={}
+        player.inventory.slots.each_with_index do |item, i|
+          temp_dict[(i+1).to_s+". "+item.name]=item
+        end
+        if temp_dict.size==0
+          puts "INVENTORY EMPTY"
+          prompt.yes?("Proceed?")
+          krv_ti_jebem=1
+          next
+        end
+        puts temp_dict
+        selected=prompt.multi_select("__Inventory__", temp_dict)
+        puts selected[0]
+        if selected[0].item_type=="Consumable"
+          choice=prompt.multi_select(selected, %w(Use Destroy Back))
+          if choice[0]=="Use"
+            player.use_item(selected[0])
+            player.inventory.item_remove(selected[0])
+            krv_ti_jebem=1
+            next
+          elsif choice[0]=="Destroy"
+            player.drop_item(selected[0])
+            krv_ti_jebem=1
+            next
+          else
+            krv_ti_jebem=1
+            next
+          end
+        elsif selected[0].item_type=="Weapon"
+          choice=prompt.multi_select(selected, %w(Use Destroy Back))
+          if choice[0]=="Use"
+            player.equip_weapon(selected[0])
+            player.inventory.item_remove(selected[0])
+            krv_ti_jebem=1
+            next
+          elsif choice[0]=="Destroy"
+            player.drop_item(selected[0])
+            krv_ti_jebem=1
+            next
+          else
+            krv_ti_jebem=1
+            next
+          end
+        end
+        krv_ti_jebem=1
+      end
+
+    end
+
     keypress=reader.on(:keyf1) do
       if krv_ti_jebem==0
         player.interact(States::Base.objects_near[0])

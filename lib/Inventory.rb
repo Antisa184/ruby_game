@@ -19,6 +19,18 @@ module Inventory
       @@count
     end
 
+    def reset_inv
+      @slots=[]
+      @gold=[]
+    end
+
+    def gain_gold(gold)
+      @gold+=gold
+    end
+    def lose_gold(gold)
+      @gold-=gold
+    end
+
     def item_remove(item)
       @slots.each_with_index do |items, i| items
         if item.id == items.id

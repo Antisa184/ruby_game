@@ -95,9 +95,9 @@ module Map
         elsif object.is_a?(Item::Weapon)
           @@map[pos_x][pos_y]="░"
         elsif object.is_a?(NPC::Enemy)
-          @@map[pos_x][pos_y]="©"
+          @@map[pos_x][pos_y]=object.map_marker
         elsif object.is_a?(NPC::EnemyBoss)
-          @@map[pos_x][pos_y]="®"
+          @@map[pos_x][pos_y]=object.map_marker
         end
       end
     end

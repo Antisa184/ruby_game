@@ -4,7 +4,7 @@ module Player
     @@id_default=1
     @@instances=[]
 
-    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor
+    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory
 
     def initialize(name, level, xp, health, damage, armor, pos_x, pos_y, dead, quests, inventory, equipped_weapon, abilities, interacting_with, map_marker, image, id = @@id_default)
       @id = id
@@ -35,6 +35,16 @@ module Player
 
     def gain_xp(xp)
       @xp+=xp
+      if @xp>29 then @level=2 end
+      if @xp>50 then @level=3 end
+      if @xp>80 then @level=4 end
+      if @xp>120 then @level=5 end
+      if @xp>200 then @level=6 end
+
+    end
+
+    def gain_gold(gold)
+      inventory.gain_gold(gold)
     end
     def self.count
       @@count
@@ -44,37 +54,41 @@ module Player
       @damage = weapon.damage
     end
     def take_item (item)
+      #puts item.attributes
       @inventory.item_add(item)
-      puts @inventory.slots
+        #puts @inventory.slots[0].class
     end
     def use_item (item)
       #SMALL POTION
-      if item.id==1
+      if item.id[0]==1
         @health+=30
       #LARGE POTION
-      elsif item.id==2
+      elsif item.id[0]==2
         @health+=60
       #SMALL ARMOR
-      elsif item.id==3
+      elsif item.id[0]==3
         @armor+=2
       #LARGE ARMOR
-      elsif item.id==4
+      elsif item.id[0]==4
         @armor+=5
       end
 
-
     end
     def sell_item (item)
-
+      @inventory.gain_gold(item.gold)
+      self.drop_item(item)
     end
     def buy_item (item)
-
+      @inventory.lose_gold(item.gold)
+      self.take_item(item)
     end
     def drop_item (item)
-
+      @inventory.item_remove(item)
     end
     def respawn
-
+      @pos_y=0
+      @pos_x=0
+      @inventory.reset_inv
     end
     def deal_damage(enemy)
       dmg=enemy.take_damage(@damage)
@@ -113,10 +127,10 @@ module Player
         choices = %w(Take Use Back)
       end
       if object[0].is_a?(NPC::QuestGiver)
-        choices = %w(Fight Back)
+        choices = %w(Quests Back)
       end
       if object[0].is_a?(NPC::Shop)
-        choices = %w(Fight Back)
+        choices = %w(Buy Sell Back)
       end
 
       choice = prompt.multi_select("Choose action", choices)
@@ -145,9 +159,19 @@ module Player
           if object[0].is_dead
             puts "\e[H\e[2J"
             puts "You won!"
-            puts "Gained 30XP!"
-            prompt.yes?("Proceed?")
-            self.gain_xp(30)
+
+            if object[0].is_a?(NPC::Enemy)
+              puts "Gained 30XP and 100 gold!"
+              prompt.yes?("Proceed?")
+              self.gain_xp(30)
+              self.gain_gold(100)
+            else
+              puts "Gained 120XP and 500 gold!"
+              prompt.yes?("Proceed?")
+              self.gain_xp(120)
+              self.gain_gold(500)
+            end
+
             Map::Base.change_pixel(object[1],object[2],".")
             States::Base.game(self)
             return
@@ -157,17 +181,38 @@ module Player
           dmg = object[0].deal_damage(self, parry)
           puts "You recieved "+dmg.to_s+" DMG."
           puts "You have "+@health.to_s+" HP remaining."
+          if self.is_dead
+            choice=prompt.select("YOU DIED", %w(Respawn Quit))
+            if choice=="Respawn"
+              self.respawn
+            else
+              puts "Exiting"
+              exit
+            end
+
+          end
         end
       elsif choice[0]=="Take"
         self.take_item(object[0])
+        prompt.yes?("Proceed?")
         Map::Base.change_pixel(object[1],object[2],".")
         return
       elsif choice[0]=="Use"
         if object[0].item_type=="Consumable"
           self.use_item(object[0])
+          Map::Base.change_pixel(object[1],object[2],".")
         else
-          self.equip_weapon(object[0])
+          if object[0].req_lvl<=self.level
+            self.equip_weapon(object[0])
+            Map::Base.change_pixel(object[1],object[2],".")
+          else
+            puts "You need to be at least level "+object[0].req_lvl.to_s+" to use this."
+            prompt.yes?("Proceed?")
+          end
+
         end
+      elsif choice[0]=="Buy"
+
       else
         States::Base.game(self)
         return

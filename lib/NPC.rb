@@ -25,7 +25,7 @@ module NPC
     end
   end
   class Enemy < Base
-    attr_accessor :health, :damage
+    attr_accessor :health, :damage, :map_marker
     def initialize(name, pos_x, pos_y, damage, armor, health, inventory, dead, map_marker, image, id = @@id_default)
       super(name, pos_x, pos_y, id)
       @damage=damage, @armor=armor, @health=health, @inventory=inventory
@@ -62,7 +62,7 @@ module NPC
     end
   end
   class EnemyBoss < Base
-    attr_accessor :health, :damage
+    attr_accessor :health, :damage, :map_marker
     def initialize(name, pos_x, pos_y, damage, armor, health, inventory, dead, map_marker, image, id = @@id_default)
       super(name, pos_x, pos_y, id)
       @damage=damage, @armor=armor, @health=health, @inventory=inventory

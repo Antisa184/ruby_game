@@ -44,7 +44,7 @@ module Item
             count, item_type, rarity, equipped, id)
       @damage = damage
       @req_lvl = req_lvl
-      @atts = ["Name: "+@name, "Desc: "+@description.to_s, "Gold: "+@gold.to_s, "Usable: "+@usable.to_s, "Stackable: "+@stackable.to_s, "Count: "+@count.to_s, "Item type: "+@item_type.to_s, "Rarity: "+@rarity.to_s, "Equipped: "+@equipped.to_s, "Damage: "+@damage.to_s,"Required lvl: "+ @req_lvl.to_s]
+      @atts = ["Id: "+@id[0].to_s, "Name: "+@name, "Desc: "+@description.to_s, "Gold: "+@gold.to_s, "Usable: "+@usable.to_s, "Stackable: "+@stackable.to_s, "Count: "+@count.to_s, "Item type: "+@item_type.to_s, "Rarity: "+@rarity.to_s, "Equipped: "+@equipped.to_s, "Damage: "+@damage.to_s,"Required lvl: "+ @req_lvl.to_s]
     end
 
   end
@@ -64,7 +64,7 @@ module Item
       super(name, description, gold, usable, stackable,
             count, item_type, rarity, equipped, id)
       @on_use = on_use
-      @atts = ["Name: "+@name, "Desc: "+@description.to_s, "Gold: "+@gold.to_s, "Usable: "+@usable.to_s, "Stackable: "+@stackable.to_s, "Count: "+@count.to_s, "Item type: "+@item_type.to_s, "Rarity: "+@rarity.to_s, "Equipped: "+@equipped.to_s, "On use: "+@on_use.to_s]
+      @atts = ["Id: "+@id[0].to_s, "Name: "+@name, "Desc: "+@description.to_s, "Gold: "+@gold.to_s, "Usable: "+@usable.to_s, "Stackable: "+@stackable.to_s, "Count: "+@count.to_s, "Item type: "+@item_type.to_s, "Rarity: "+@rarity.to_s, "Equipped: "+@equipped.to_s, "On use: "+@on_use.to_s]
     end
 
   end
