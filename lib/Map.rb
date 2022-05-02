@@ -108,7 +108,7 @@ module Map
 
     end
     def self.check_collision(pos_x, pos_y)
-      return "▓░©®".include?(@@map[pos_x][pos_y])
+      return "▓░©®EĐ".include?(@@map[pos_x][pos_y])
     end
 
   end
