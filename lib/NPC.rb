@@ -33,15 +33,21 @@ module NPC
       @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Damage: "+@damage.to_s, "Armor: "+@armor.to_s, "Health: "+@health.to_s,"Inventory: "+@inventory.to_s, "Dead: "+@dead.to_s, "Map marker: "+@map_marker.to_s]
     end
     def is_dead
-      @dead
+      if @dead.is_a?(Array)
+        @dead[0]
+      else
+        @dead
+      end
+
     end
     def deal_damage(player, parry)
-      dmg=@damage
+      dmg=@damage[0]
+      dmg=dmg-player.armor
       if parry
         dmg-=player.damage
-        if dmg<0 then dmg=0 end
       end
-      player.take_damage(@damage)
+      if dmg<0 then dmg=0 end
+      player.take_damage(dmg)
       dmg
     end
     def take_damage(dmg)
@@ -52,6 +58,7 @@ module NPC
         @dead = true
         @health = 0
       end
+      dmg
     end
   end
   class EnemyBoss < Base

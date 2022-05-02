@@ -4,7 +4,7 @@ module Player
     @@id_default=1
     @@instances=[]
 
-    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage
+    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor
 
     def initialize(name, level, xp, health, damage, armor, pos_x, pos_y, dead, quests, inventory, equipped_weapon, abilities, interacting_with, map_marker, image, id = @@id_default)
       @id = id
@@ -33,13 +33,35 @@ module Player
       @@instances.inspect
     end
 
+    def gain_xp(xp)
+      @xp+=xp
+    end
     def self.count
       @@count
     end
     def equip_weapon (weapon)
       @equipped_weapon = weapon
+      @damage = weapon.damage
+    end
+    def take_item (item)
+      @inventory.item_add(item)
+      puts @inventory.slots
     end
     def use_item (item)
+      #SMALL POTION
+      if item.id==1
+        @health+=30
+      #LARGE POTION
+      elsif item.id==2
+        @health+=60
+      #SMALL ARMOR
+      elsif item.id==3
+        @armor+=2
+      #LARGE ARMOR
+      elsif item.id==4
+        @armor+=5
+      end
+
 
     end
     def sell_item (item)
@@ -55,10 +77,10 @@ module Player
 
     end
     def deal_damage(enemy)
-      enemy.take_damage(@damage)
+      dmg=enemy.take_damage(@damage)
+      dmg
     end
     def take_damage(dmg)
-      dmg=dmg-@armor
       if dmg<0 then dmg=0 end
       @health=@health-dmg
       if @health<=0
@@ -79,7 +101,8 @@ module Player
       @dead
     end
     def interact(object)
-      puts "\e[H\e[2J"
+      if object.nil? then return end
+      #puts "\e[H\e[2J"
       puts object[0].attributes
 
       prompt = TTY::Prompt.new
@@ -108,24 +131,48 @@ module Player
           #PLAYER'S TURN
           if action[0]=="Attack"
             puts "\e[H\e[2J"
-            deal_damage(object[0])
-            puts "You dealt "+@damage.to_s+" DMG."
+            dmg=deal_damage(object[0])
+            puts "You dealt "+dmg.to_s+" DMG."
             puts "Enemy has "+object[0].health.to_s+" HP remaining."
 
           elsif action[0]=="Parry"
             parry=true
           else
-            break
+            States::Base.game(self)
+            return
+          end
+
+          if object[0].is_dead
+            puts "\e[H\e[2J"
+            puts "You won!"
+            puts "Gained 30XP!"
+            prompt.yes?("Proceed?")
+            self.gain_xp(30)
+            Map::Base.change_pixel(object[1],object[2],".")
+            States::Base.game(self)
+            return
           end
 
           #ENEMY TURN
           dmg = object[0].deal_damage(self, parry)
           puts "You recieved "+dmg.to_s+" DMG."
           puts "You have "+@health.to_s+" HP remaining."
-
         end
+      elsif choice[0]=="Take"
+        self.take_item(object[0])
+        Map::Base.change_pixel(object[1],object[2],".")
+        return
+      elsif choice[0]=="Use"
+        if object[0].item_type=="Consumable"
+          self.use_item(object[0])
+        else
+          self.equip_weapon(object[0])
+        end
+      else
+        States::Base.game(self)
+        return
       end
-      Map::Base.change_pixel(object[1],object[2],".")
+
     end
   end
 end

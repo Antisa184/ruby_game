@@ -77,8 +77,8 @@ module Map
         y=Map::Base.width-20
       else y=pos_y-9
       end
-      puts x, y
-      puts pos_x, pos_y
+      #puts x, y
+      #puts pos_x, pos_y
       restricted=@@map.map(&:clone)
       restricted[pos_x][pos_y]=map_marker
       restricted=restricted[x,20]
