@@ -3,7 +3,7 @@ module Quest
     @@count=0
     @@id_default=1
     @@instances=[]
-    def initialize
+    def initialize()
       super
       @@count += 1
       @@instances << self
