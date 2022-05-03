@@ -33,11 +33,11 @@ class Game
                                           ],
                                       5000, 1337)
 
-  @@objects.append(NPC::Shop.new("Studenac", 10, 20, [shop_inventory], 1))
+  @@objects.append(NPC::Shop.new("Studenac", 10, 20, shop_inventory, 1))
 
   map = Map::Base.new("mapa", 71, 30, [], nil)
   @@objects.each do |item|
-    if item.is_a?(NPC::Enemy) or item.is_a?(NPC::EnemyBoss)
+    if item.is_a?(NPC::Enemy) or item.is_a?(NPC::EnemyBoss) or item.is_a?(NPC::Shop)
       x=item.pos_x.to_i
       y=item.pos_y.to_i
     else

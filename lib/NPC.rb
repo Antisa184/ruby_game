@@ -71,15 +71,19 @@ module NPC
 
     end
     def is_dead
-      @dead
+      if @dead.is_a?(Array)
+        @dead[0]
+      else
+        @dead
+      end
     end
     def deal_damage(player, parry)
-      dmg=@damage
+      dmg=@damage[0]
       if parry
         dmg-=player.damage
         if dmg<0 then dmg=0 end
       end
-      player.take_damage(@damage)
+      player.take_damage(@damage[0])
       dmg
     end
     def take_damage(dmg)
@@ -93,18 +97,23 @@ module NPC
     end
   end
   class Shop < Base
+    attr_reader :inventory
     def initialize(name, pos_x, pos_y, inventory, id = @@id_default)
       super(name, pos_x, pos_y, id)
       @inventory = inventory
+      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Inventory: "+@inventory.to_s]
+
     end
+
     def set_items
 
     end
   end
   class QuestGiver < Base
-    def initialize(id, name, pos_x, pos_y, quests)
+    def initialize(name, pos_x, pos_y, quests, id = @@id_default)
       super(id, name, pos_x, pos_y)
       @quests = quests
+      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Quests: "+@quests.to_s]
     end
     def display_quests
       #@quests.each_with_index do |quest, i | quest

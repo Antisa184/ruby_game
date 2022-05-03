@@ -19,6 +19,11 @@ module Inventory
       @@count
     end
 
+    def pretty_slots
+      @slots.each_with_index do |item, i| item
+        puts (i+1).to_s+". "+item.attributes.to_s
+      end
+    end
     def reset_inv
       @slots=[]
       @gold=[]

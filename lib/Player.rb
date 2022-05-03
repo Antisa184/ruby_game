@@ -44,7 +44,10 @@ module Player
     end
 
     def gain_gold(gold)
-      inventory.gain_gold(gold)
+      @inventory.gain_gold(gold)
+    end
+    def lose_gold(gold)
+      @inventory.lose_gold(gold)
     end
     def self.count
       @@count
@@ -89,6 +92,7 @@ module Player
       @pos_y=0
       @pos_x=0
       @inventory.reset_inv
+      @health=100
     end
     def deal_damage(enemy)
       dmg=enemy.take_damage(@damage)
@@ -185,13 +189,14 @@ module Player
             choice=prompt.select("YOU DIED", %w(Respawn Quit))
             if choice=="Respawn"
               self.respawn
+              return
             else
               puts "Exiting"
               exit
             end
-
           end
         end
+
       elsif choice[0]=="Take"
         self.take_item(object[0])
         prompt.yes?("Proceed?")
@@ -212,12 +217,8 @@ module Player
 
         end
       elsif choice[0]=="Buy"
-        puts object[0].inventory.slots
-        prompt.yes?("Still not done")
-
-
         temp_dict={}
-        object.inventory.slots.each_with_index do |item, i|
+        object[0].inventory.slots.each_with_index do |item, i|
           temp_dict[(i+1).to_s+". "+item.name]=item
         end
         if temp_dict.size==0
@@ -227,9 +228,39 @@ module Player
           return
         end
         selected=prompt.multi_select("__Shop inventory__", temp_dict)
-      elsif choice[0]=="Buy"
-        puts self.inventory.slots
-        prompt.yes?("Still not done")
+        choice_=prompt.select(selected[0], %w(Buy Back))
+
+        if choice_=="Buy"
+          if self.inventory.gold>=selected[0].gold
+            self.lose_gold(selected[0].gold)
+            self.take_item(selected[0])
+            puts "Item aquired, you spent "+selected[0].gold.to_s+" gold."
+            prompt.yes?("Proceed?")
+          else
+            puts "Not enough gold!"
+            prompt.yes?("Proceed?")
+          end
+        end
+      elsif choice[0]=="Sell"
+        temp_dict={}
+        self.inventory.slots.each_with_index do |item, i|
+          temp_dict[(i+1).to_s+". "+item.name]=item
+        end
+        if temp_dict.size==0
+          puts "INVENTORY EMPTY"
+          prompt.yes?("Proceed?")
+          #krv_ti_jebem=1
+          return
+        end
+        selected=prompt.multi_select("__Inventory__", temp_dict)
+        choice_=prompt.select(selected[0], %w(Sell Back))
+
+        if choice_=="Sell"
+          self.gain_gold(selected[0].gold)
+          self.drop_item(selected[0])
+          puts("Item sold, you gained "+selected[0].gold.to_s+" gold.")
+          prompt.yes?("Proceed?")
+        end
       else
         States::Base.game(self)
         return
