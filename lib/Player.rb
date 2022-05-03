@@ -212,7 +212,24 @@ module Player
 
         end
       elsif choice[0]=="Buy"
+        puts object[0].inventory.slots
+        prompt.yes?("Still not done")
 
+
+        temp_dict={}
+        object.inventory.slots.each_with_index do |item, i|
+          temp_dict[(i+1).to_s+". "+item.name]=item
+        end
+        if temp_dict.size==0
+          puts "SHOP EMPTY"
+          prompt.yes?("Proceed?")
+          #krv_ti_jebem=1
+          return
+        end
+        selected=prompt.multi_select("__Shop inventory__", temp_dict)
+      elsif choice[0]=="Buy"
+        puts self.inventory.slots
+        prompt.yes?("Still not done")
       else
         States::Base.game(self)
         return

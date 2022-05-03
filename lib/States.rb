@@ -15,7 +15,7 @@ module States
     end
 
     def self.near_object(x, y)
-      if x>=0 and x<Map::Base.height and y>=0 and y<Map::Base.width and "▓░©®EĐ".include? Map::Base.entire_map[x][y]
+      if x>=0 and x<Map::Base.height and y>=0 and y<Map::Base.width and "▓░©®EĐ€".include? Map::Base.entire_map[x][y]
         Map::Base.objects.each do |o|
           if o[1]==x and o[2]==y
             if @@object_count==1 then puts "To interact with object press the corresponding function key." end

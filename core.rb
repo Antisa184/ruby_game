@@ -26,6 +26,15 @@ class Game
 
   @@objects.append(NPC::EnemyBoss.new("Đurisimus", 15, 35, 25, 12, 75, [], false, "Đ", "asdf", 1))
 
+  shop_inventory=Inventory::Base.new(10, [Item::Consumable.new("Small Health potion", "Restores 30 HP", 25, true, true, 1, "Consumable", 1, false, "Restore 30 HP",1),
+                                          Item::Consumable.new("Large Health potion", "Restores 60 HP", 40, true, true, 1, "Consumable", 2, false, "Restore 60 HP",2),
+                                          Item::Weapon.new("Common Dagger", "Small knife", 50, true, false, 1, "Weapon", 1, false, 20, 1, 1),
+                                          Item::Weapon.new("Better Dagger", "Small sharp knife", 120, true, false, 1, "Weapon", 3, false, 20, 3, 2)
+                                          ],
+                                      5000, 1337)
+
+  @@objects.append(NPC::Shop.new("Studenac", 10, 20, [shop_inventory], 1))
+
   map = Map::Base.new("mapa", 71, 30, [], nil)
   @@objects.each do |item|
     if item.is_a?(NPC::Enemy) or item.is_a?(NPC::EnemyBoss)

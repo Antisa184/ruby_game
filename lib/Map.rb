@@ -98,6 +98,8 @@ module Map
           @@map[pos_x][pos_y]=object.map_marker
         elsif object.is_a?(NPC::EnemyBoss)
           @@map[pos_x][pos_y]=object.map_marker
+        elsif object.is_a?(NPC::Shop)
+          @@map[pos_x][pos_y]="€"
         end
       end
     end
@@ -108,7 +110,7 @@ module Map
 
     end
     def self.check_collision(pos_x, pos_y)
-      return "▓░©®EĐ".include?(@@map[pos_x][pos_y])
+      return "▓░©®EĐ€".include?(@@map[pos_x][pos_y])
     end
 
   end
