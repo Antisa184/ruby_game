@@ -53,8 +53,15 @@ module Player
       @@count
     end
     def equip_weapon (weapon)
+      if @equipped_weapon!=nil
+        self.take_item(@equipped_weapon)
+      end
       @equipped_weapon = weapon
       @damage = weapon.damage
+    end
+    def unequip_weapon
+      @equipped_weapon = nil
+      @damage = 5
     end
     def take_item (item)
       #puts item.attributes

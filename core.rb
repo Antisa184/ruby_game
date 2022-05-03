@@ -6,7 +6,7 @@ class Game
   Dir["lib/*.rb"].each do |file| require_relative file end
 
   def initialize
-    puts "kurac palac"
+    #puts "kurac palac"
   end
   @@objects=[]
 
@@ -17,8 +17,8 @@ class Game
 
   @@objects.append(Item::Weapon.new("Common Dagger", "Small knife", 50, true, false, 1, "Weapon", 1, false, 20, 1, 1))
   @@objects.append(Item::Weapon.new("Common Dagger", "Small knife", 50, true, false, 1, "Weapon", 1, false, 20, 1, 1))
-  @@objects.append(Item::Weapon.new("Better Dagger", "Small sharp knife", 120, true, false, 1, "Weapon", 3, false, 20, 3, 2))
-  @@objects.append(Item::Weapon.new("Better Dagger", "Small sharp knife", 120, true, false, 1, "Weapon", 3, false, 20, 3, 2))
+  @@objects.append(Item::Weapon.new("Better Dagger", "Small sharp knife", 120, true, false, 1, "Weapon", 3, false, 40, 3, 2))
+  @@objects.append(Item::Weapon.new("Better Dagger", "Small sharp knife", 120, true, false, 1, "Weapon", 3, false, 40, 3, 2))
 
   @@objects.append(NPC::Enemy.new("Đuro", 25, 15, 5, 2, 35, [], false, "E", "asdf", 3))
   @@objects.append(NPC::Enemy.new("Đuro", 29, 10, 5, 2, 35, [], false, "E", "asdf", 3))
@@ -45,7 +45,7 @@ class Game
       y=rand(0...Map::Base.width)
     end
     Map::Base.add_object(item, x, y)
-    puts item.attributes, "\n"
+      #puts item.attributes, "\n"
   end
 
   Map::Base.add_object(Item::Weapon.new("Common Dagger", "Small knife", 50, true, false, 1, "Weapon", 1, false, 20, 1, 2), 5,7)
@@ -69,7 +69,7 @@ class Game
     puts "\e[H\e[2J"
 
     States::Base.game(player)
-    puts("↑,↓,←,→ - Move around, I - Inventory, Esc - Main Menu")
+    puts("↑,↓,←,→ - Move around, I - Inventory, Q - Weapon, Esc - Main Menu")
     puts("Player position: "+player.pos_x.to_s+","+player.pos_y.to_s)
     puts("Health: "+player.health.to_s+", Level: "+player.level.to_s+", XP: "+player.xp.to_s+", DMG: "+player.damage.to_s+", Gold: "+player.inventory.gold.to_s)
     #puts States::Base.objects_near
@@ -102,6 +102,21 @@ class Game
 
     keypress=reader.on(:keypress) do |event|
       #if krv_ti_jebem!=0 then next end
+
+      if event.value == "q" and krv_ti_jebem==0
+        if player.equipped_weapon!=nil
+          puts player.equipped_weapon.name
+          w=prompt.yes?("Unequip weapon?")
+          if w
+            player.take_item(player.equipped_weapon)
+            player.unequip_weapon
+          end
+        else
+          puts "No weapon equipped!"
+          prompt.yes?("Proceed?")
+        end
+        krv_ti_jebem=1
+      end
       if event.value == "i" and krv_ti_jebem==0
         temp_dict={}
         player.inventory.slots.each_with_index do |item, i|
@@ -109,11 +124,13 @@ class Game
         end
         if temp_dict.size==0
           puts "INVENTORY EMPTY"
+
           prompt.yes?("Proceed?")
+
           krv_ti_jebem=1
           next
         end
-        puts temp_dict
+        #puts temp_dict
         selected=prompt.multi_select("__Inventory__", temp_dict)
         puts selected[0]
         if selected[0].item_type=="Consumable"
