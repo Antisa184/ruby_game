@@ -190,6 +190,7 @@ module Player
       @pos_x=0
       @inventory.reset_inv
       @health=100
+      @dead=false
     end
     def deal_damage(enemy)
       dmg=enemy.take_damage(@damage)

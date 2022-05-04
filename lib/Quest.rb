@@ -71,7 +71,7 @@ module Quest
       end
       if @command[0]=="Spend"
         if command[2]=="Gold"
-          return amount<=player.stats.gold_collected-@gold_collected
+          return amount<=player.stats.gold_spent-@gold_spent
         end
       end
       if @command[0]=="Gain"

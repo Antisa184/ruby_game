@@ -98,6 +98,7 @@ module NPC
         @dead = true
         @health = 0
       end
+      dmg
     end
   end
   class Shop < Base
