@@ -11,7 +11,8 @@ class Game
     puts Map::Base.entire_map
   end
 
-  def self.open_inventory(player, prompt)
+  def self.open_inventory(player)
+    prompt=TTY::Prompt.new
     temp_dict={}
     player.inventory.slots.each_with_index do |item, i|
       temp_dict[(i+1).to_s+". "+item.name]=item
@@ -28,11 +29,11 @@ class Game
     puts selected
     if selected.item_type=="Consumable"
       choice=prompt.select(selected, %w(Use Destroy Back))
-      if choice[0]=="Use"
+      if choice=="Use"
         player.use_item(selected)
         player.inventory.item_remove(selected)
         return 1
-      elsif choice[0]=="Destroy"
+      elsif choice=="Destroy"
         player.drop_item(selected)
         return 1
       else
@@ -40,11 +41,11 @@ class Game
       end
     elsif selected.item_type=="Weapon"
       choice=prompt.select(selected, %w(Use Destroy Back))
-      if choice[0]=="Use"
+      if choice=="Use"
         player.equip_weapon(selected)
         player.inventory.item_remove(selected)
         return 1
-      elsif choice[0]=="Destroy"
+      elsif choice=="Destroy"
         player.drop_item(selected)
         return 1
       else
@@ -53,12 +54,12 @@ class Game
     end
     return 1
   end
-  def self.view_weapon(player, prompt)
+  def self.view_weapon(player)
+    prompt=TTY::Prompt.new
     if player.equipped_weapon!=nil
       puts player.equipped_weapon.name
       w=prompt.yes?("Unequip weapon?")
       if w
-        player.take_item(player.equipped_weapon)
         player.unequip_weapon
       end
     else
@@ -117,11 +118,11 @@ class Game
       reader.on(:keypress) do |event|
         #IF PLAYER PRESSED q VIEW WEAPON
         if event.value == "q" and reset_reader==0
-          reset_reader=view_weapon(player, prompt)
+          reset_reader=view_weapon(player)
         end
         #IF PLAYER PRESSED i OPEN INVENTORY
         if event.value == "i" and reset_reader==0
-          reset_reader=open_inventory(player, prompt)
+          reset_reader=open_inventory(player)
         end
 
       end

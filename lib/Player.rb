@@ -49,6 +49,11 @@ module Player
       @@count
     end
     def equip_weapon (weapon)
+      if weapon.req_lvl>self.level
+        puts "You need to be level "+weapon.req_lvl.to_s+" to use this weapon."
+        TTY::Prompt.new.yes?("Proceed?")
+        return
+      end
       if @equipped_weapon!=nil
         self.take_item(@equipped_weapon)
         @equipped_weapon=nil
@@ -57,6 +62,7 @@ module Player
       @damage = weapon.damage
     end
     def unequip_weapon
+      self.take_item(@equipped_weapon)
       @equipped_weapon = nil
       @damage = 5
     end
@@ -190,7 +196,8 @@ module Player
       choices
     end
 
-    def determine_type_and_use(object, object_x, object_y, prompt)
+    def determine_type_and_use(object, object_x, object_y)
+      prompt=TTY::Prompt.new
       if object.item_type=="Consumable"
         self.use_item(object)
         Map::Base.change_pixel(object_x,object_y,".")
@@ -205,7 +212,8 @@ module Player
       end
     end
 
-    def sell_item(object, prompt)
+    def sell_item(object)
+      prompt=TTY::Prompt.new
       temp_dict={}
       self.inventory.slots.each_with_index do |item, i|
         temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
@@ -233,7 +241,8 @@ module Player
       end
     end
 
-    def buy_item(object, prompt)
+    def buy_item(object)
+      prompt=TTY::Prompt.new
       temp_dict={}
       object.inventory.slots.each_with_index do |item, i|
         temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
@@ -285,13 +294,13 @@ module Player
         return
 
       elsif choice=="Use"
-        self.determine_type_and_use(object, object_x, object_y, prompt)
+        self.determine_type_and_use(object, object_x, object_y)
         return
       elsif choice=="Buy"
-        self.buy_item(object,prompt)
+        self.buy_item(object)
         return
       elsif choice=="Sell"
-        self.sell_item(object, prompt)
+        self.sell_item(object)
         return
       else
         States::Base.game(self)
