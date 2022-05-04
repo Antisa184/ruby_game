@@ -10,7 +10,17 @@ class Game
     Initialize::Base.setup_map(@@objects)
     puts Map::Base.entire_map
   end
-
+  def self.check_quests(player)
+    player.quests.each_with_index do |q, i| q
+      if q.check_if_complete(player)
+        puts q.name+" quest complete. You earned "+q.reward_gold.to_s+" gold and "+q.reward_xp.to_s+" XP."
+        player.gain_xp(q.reward_xp)
+        player.gain_gold(q.reward_gold)
+        player.quests.delete_at(i)
+        TTY::Prompt.new.yes?("Proceed?")
+      end
+    end
+  end
   def self.open_inventory(player)
     prompt=TTY::Prompt.new
     temp_dict={}
@@ -28,7 +38,7 @@ class Game
     end
     #SELECT ITEM FROM INVENTORY
     selected=prompt.select("__Inventory__", temp_dict)
-    puts selected
+    puts selected.name
     if selected.item_type=="Consumable"
       choice=prompt.select(selected, %w(Use Destroy Back))
       if choice=="Use"
@@ -74,8 +84,8 @@ class Game
     return 1
   end
   def self.create_player(name, marker)
-    Player::Stats.new
-    return Player::Base.new(name, 1, 0,100, 5, 2, 0, 0, false, [], Inventory::Base.new(10,[],500), nil, [], nil, marker, "asdf")
+    stats=Player::Stats.new
+    return Player::Base.new(name, 1, 0,100, 5, 2, 0, 0, false, [], Inventory::Base.new(10,[],500), nil, [], nil, marker, "asdf", stats, 123)
   end
   def self.play(player)
     reset_reader=0
@@ -83,19 +93,24 @@ class Game
     loop do
       puts "\e[H\e[2J"
       States::Base.game(player)
-      puts("↑,↓,←,→ - Move around, I - Inventory, Q - Weapon, Esc - Main Menu")
+      puts("↑,↓,←,→ - Move around, I - Inventory, W - Weapon, Q - Quests, S - Stats, Esc - Main Menu")
       puts("Player position: "+player.pos_x.to_s+","+player.pos_y.to_s)
       puts("Health: "+player.health.to_s+", Level: "+player.level.to_s+", XP: "+player.xp.to_s+", DMG: "+player.damage.to_s+", Gold: "+player.inventory.gold.to_s)
 
+
+      #CHECK IF ANY QUESTS ARE COMPLETE
+      check_quests(player)
       #HELPER
       reader.read_keypress
 
       #MAIN MENU
       reader.on(:keyescape) do
-        puts "Escape"
-        States::Base.main_menu
-        reader.on(:keyescape) do
-          States::Base.game(player)
+        if reset_reader==0
+          puts "Escape"
+          reset_reader=States::Base.main_menu(player)
+          reader.on(:keyescape) do
+            States::Base.game(player)
+          end
         end
       end
 
@@ -124,7 +139,7 @@ class Game
       #READ SPECIAL KEYPRESS
       reader.on(:keypress) do |event|
         #IF PLAYER PRESSED q VIEW WEAPON
-        if event.value == "q" and reset_reader==0
+        if event.value == "w" and reset_reader==0
           reset_reader=view_weapon(player)
         end
         #IF PLAYER PRESSED i OPEN INVENTORY
@@ -132,7 +147,10 @@ class Game
           reset_reader=open_inventory(player)
         end
         if event.value == "s" and reset_reader==0
-          reset_reader=Player::Stats.show
+          reset_reader=player.stats.show
+        end
+        if event.value == "q" and reset_reader==0
+          reset_reader=player.show_quests
         end
 
       end

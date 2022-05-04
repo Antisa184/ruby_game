@@ -17,7 +17,7 @@ module NPC
       if @id == @@id_default then @@id_default+=1 end
       @@count += 1
       @@instances << self
-      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s]
+      @atts = ["Name: "+@name.to_s, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s]
     end
     def self.all
       @@instances.inspect
@@ -114,14 +114,17 @@ module NPC
     end
   end
   class QuestGiver < Base
+
+    attr_accessor :quests
+
     def initialize(name, pos_x, pos_y, quests, id = @@id_default)
-      super(id, name, pos_x, pos_y)
+      super(name, pos_x, pos_y, id)
       @quests = quests
-      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Quests: "+@quests.to_s]
+      @atts = ["Name: "+@name.to_s, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Quests: "+@quests.to_s]
     end
     def display_quests
       @quests.each_with_index do |quest, i | quest
-        puts i+". "+quest.name+" Description: "+quest.description
+        puts (i+1).to_s+". "+quest.name+" Description: "+quest.description
       end
     end
   end

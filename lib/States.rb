@@ -4,9 +4,9 @@ module States
       x>=0 and x<Map::Base.height and y>=0 and y<Map::Base.width
     end
     def self.special_char?(x, y)
-      "▓░©®EĐ€".include? Map::Base.entire_map[x][y]
+      "▓░©®EĐ€Q".include? Map::Base.entire_map[x][y]
     end
-    def self.main_menu
+    def self.main_menu(player)
       prompt=TTY::Prompt.new
       choices = %w(Inventory Back Exit)
       results = prompt.select("__Menu__", choices)
@@ -15,6 +15,7 @@ module States
         puts 'Exiting'
         exit
       elsif results=='Inventory'
+        return Game.open_inventory(player)
       end
     end
 
@@ -23,7 +24,7 @@ module States
         Map::Base.objects.each do |o|
           if o[1]==x and o[2]==y
             if @@object_count==1 then puts "To interact with object press the corresponding function key." end
-            puts "F"+@@object_count.to_s+" "+o[0].name+" Type: "+o[0].class.to_s
+            puts "F"+@@object_count.to_s+" "+o[0].name.to_s+" Type: "+o[0].class.to_s
             @@objects_near.append(o)
             return true
           end
@@ -34,7 +35,7 @@ module States
     def self.game(player)
 
       #RENDER MAP
-      puts Map::Base.render(player.pos_x, player.pos_y, player.map_marker)
+      puts Map::Base.render(player)
 
       #####CHECK IF PLAYER NEAR OBJECTS
       @@object_count=1

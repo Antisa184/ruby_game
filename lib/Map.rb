@@ -4,6 +4,10 @@ module Map
     @@count=0
     @@id_default=1
     @@instances=[]
+
+    #PREVIOUS PLAYER POSITION
+    @@prev_x=0
+    @@prev_y=0
     attr_reader :width, :height, :map
 
     def initialize(name, width, height, objects, out, id = @@id_default)
@@ -42,7 +46,14 @@ module Map
       @@map[x][y]=pixel
     end
 
-    def self.render(pos_x=0, pos_y=0, map_marker)
+    def self.render(player)
+      pos_x=player.pos_x
+      pos_y=player.pos_y
+      map_marker=player.map_marker
+      #COUNT STEPS
+      if pos_x!=@@prev_x or pos_y!=@@prev_y
+        player.stats.steps+=1
+      end
       x=0, y=0
       #ENFORCING WINDOW SIZE AND DRAWING MAP
       if pos_x<10 then x=0
@@ -55,8 +66,7 @@ module Map
         y=Map::Base.width-20
       else y=pos_y-9
       end
-      #puts x, y
-      #puts pos_x, pos_y
+
       restricted=@@map.map(&:clone)
       restricted[pos_x][pos_y]=map_marker
       restricted=restricted[x,20]
@@ -78,6 +88,8 @@ module Map
           @@map[pos_x][pos_y]=object.map_marker
         elsif object.is_a?(NPC::Shop)
           @@map[pos_x][pos_y]="€"
+        elsif object.is_a?(NPC::QuestGiver)
+          @@map[pos_x][pos_y]="Q"
         end
       end
     end
@@ -88,7 +100,7 @@ module Map
 
     end
     def self.check_collision(pos_x, pos_y)
-      return "▓░©®EĐ€".include?(@@map[pos_x][pos_y])
+      return "▓░©®EĐ€Q".include?(@@map[pos_x][pos_y])
     end
 
   end

@@ -26,7 +26,7 @@ module Inventory
       slots_string=""
       @slots.each_with_index do |item, i| item
         slots_string+=(i+1).to_s+". "+item.attributes.to_s+"\n"
-        puts (i+1).to_s+". "+item.attributes.to_s
+                                            ##puts (i+1).to_s+". "+item.attributes.to_s
       end
       slots_string
     end

@@ -7,6 +7,13 @@ module Initialize
         return false
       end
     end
+    def self.load_quests(objects, file, sep)
+      file.each do |line|
+        lineSplit = line.split(sep)
+        objects.append(Quest::Base.new(lineSplit[0], lineSplit[1], lineSplit[2].split(" "), lineSplit[3].to_i, lineSplit[4].to_i))
+      end
+      return objects
+    end
     def self.load_items(objects, file, sep)
       file.each do |line|
         lineSplit = line.split(sep)
@@ -33,6 +40,10 @@ module Initialize
           items=lineSplit[5].split("|")
           enemy_inventory=Initialize::Base.load_items([], items, ",")
           objects.append(NPC::Shop.new(lineSplit[1], lineSplit[2].to_i, lineSplit[3].to_i, Inventory::Base.new(lineSplit[4].to_i, enemy_inventory, lineSplit[5].to_i, lineSplit[6].to_i), lineSplit[7].to_i))
+        elsif lineSplit[0]=="QuestGiver"
+          items=lineSplit[4].split("|")
+          quests=Initialize::Base.load_quests([], items, ",")
+          objects.append(NPC::QuestGiver.new(lineSplit[1], lineSplit[2].to_i, lineSplit[3].to_i, quests, lineSplit[5].to_i))
         end
       end
       return objects
@@ -61,7 +72,7 @@ module Initialize
 
       #PUTTING OBJECTS ON THE MAP
       objects.each do |item|
-        if item.is_a?(NPC::Enemy) or item.is_a?(NPC::EnemyBoss) or item.is_a?(NPC::Shop)
+        if item.is_a?(NPC::Enemy) or item.is_a?(NPC::EnemyBoss) or item.is_a?(NPC::Shop) or item.is_a?(NPC::QuestGiver)
           x=item.pos_x.to_i
           y=item.pos_y.to_i
         else

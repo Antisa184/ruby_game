@@ -1,21 +1,30 @@
 module Player
   class Stats
-    @@atts=["Kills: "+@kills.to_s, "Gold collected: "+@gold_collected.to_s, "Gold spent: "+@gold_spent.to_s, "Items collected: "+@items_collected.to_s, "Steps taken: "+@steps.to_s,
-           "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s]
 
-    def initialize(kills=0,gold_collected=0, gold_spent=0, items_collected=0, steps=0, damage_dealt=0, damage_taken=0, healed=0)
-      @kills=kills
-      @gold_collected=gold_collected
-      @gold_spent=gold_spent
-      @items_collected=items_collected
-      @steps=steps
-      @damage_dealt=damage_dealt
-      @damage_taken=damage_taken
-      @healed=healed
+    attr_accessor :kills, :gold_collected, :gold_spent, :items_collected, :steps, :damage_dealt, :damage_taken, :healed, :xp_gained, :killed, :items
+
+    def initialize
+      @kills=0
+      @killed=[]
+      @gold_collected=0
+      @gold_spent=0
+      @items_collected=0
+      @items=[]
+      @steps=0
+      @damage_dealt=0
+      @damage_taken=0
+      @healed=0
+      @xp_gained=0
       @@atts=["Kills: "+@kills.to_s, "Gold collected: "+@gold_collected.to_s, "Gold spent: "+@gold_spent.to_s, "Items collected: "+@items_collected.to_s, "Steps taken: "+@steps.to_s,
-             "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s]
+              "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s, "XP gained: "+@xp_gained.to_s]
     end
-    def self.show
+    def killed
+      @killed
+    end
+    def show
+      @@atts=["Kills: "+@kills.to_s, "Gold collected: "+@gold_collected.to_s, "Gold spent: "+@gold_spent.to_s, "Items collected: "+@items_collected.to_s, "Steps taken: "+@steps.to_s,
+              "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s, "XP gained: "+@xp_gained.to_s, "Killed: "+@killed.to_s, "Items: "+@items.to_s]
+
       @@atts.each do |att|
       puts att
       end
@@ -23,14 +32,15 @@ module Player
       return 1
     end
   end
+
   class Base
     @@count=0
     @@id_default=1
     @@instances=[]
 
-    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory
+    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory, :stats, :quests
 
-    def initialize(name, level, xp, health, damage, armor, pos_x, pos_y, dead, quests, inventory, equipped_weapon, abilities, interacting_with, map_marker, image, id = @@id_default)
+    def initialize(name, level, xp, health, damage, armor, pos_x, pos_y, dead, quests, inventory, equipped_weapon, abilities, interacting_with, map_marker, image, stats, id = @@id_default)
       @id = id
       if @id == @@id_default then @@id_default+=1 end
       @name = name
@@ -49,6 +59,7 @@ module Player
       @interacting_with = interacting_with
       @map_marker = map_marker
       @image = image
+      @stats = stats
 
       @@count += 1
       @@instances << self
@@ -58,15 +69,18 @@ module Player
     end
 
     def gain_xp(xp)
+      @stats.xp_gained+=xp
       @xp+=xp
       @level=Initialize::Base.determine_level(@xp)
     end
 
     def gain_gold(gold)
       @inventory.gain_gold(gold)
+      @stats.gold_collected+=gold
     end
     def lose_gold(gold)
       @inventory.lose_gold(gold)
+      @stats.gold_spent+=gold
     end
     def self.count
       @@count
@@ -90,16 +104,20 @@ module Player
       @damage = 5
     end
     def take_item (item)
-      #puts item.attributes
       @inventory.item_add(item)
-        #puts @inventory.slots[0].class
+      @stats.items_collected+=1
+      @stats.items.append(item)
     end
     def use_item (item)
+      @stats.items_collected+=1
+      @stats.items.append(item)
       #SMALL POTION
       if item.id==1
+        @stats.healed+=30
         @health+=30
       #LARGE POTION
       elsif item.id==2
+        @stats.healed+=60
         @health+=60
       #SMALL ARMOR
       elsif item.id==3
@@ -113,6 +131,59 @@ module Player
     def drop_item (item)
       @inventory.item_remove(item)
     end
+    def sell_item(object)
+      prompt=TTY::Prompt.new
+      temp_dict={}
+      self.inventory.slots.each_with_index do |item, i|
+        temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
+      end
+      if temp_dict.size==0
+        puts "INVENTORY EMPTY"
+        prompt.yes?("Proceed?")
+        return
+      end
+      selected=prompt.select("__Inventory__", temp_dict)
+      choice_=prompt.select(selected, %w(Sell Back))
+
+      if choice_=="Sell"
+        if object.inventory.gold-selected.gold>=0
+          self.gain_gold(selected.gold)
+          self.drop_item(selected)
+          object.inventory.lose_gold(selected.gold)
+          puts("Item sold, you gained "+selected.gold.to_s+" gold.")
+          prompt.yes?("Proceed?")
+        else
+          puts("The shop doesn't have enough funds")
+          prompt.yes?("Proceed?")
+        end
+      end
+    end
+    def buy_item(object)
+      prompt=TTY::Prompt.new
+      temp_dict={}
+      object.inventory.slots.each_with_index do |item, i|
+        temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
+      end
+      if temp_dict.size==0
+        puts "SHOP EMPTY"
+        prompt.yes?("Proceed?")
+        return
+      end
+      selected=prompt.select("__Shop inventory__", temp_dict)
+      choice_=prompt.select(selected, %w(Buy Back))
+
+      if choice_=="Buy"
+        if self.inventory.gold>=selected.gold
+          self.lose_gold(selected.gold)
+          self.take_item(selected)
+          puts "Item aquired, you spent "+selected.gold.to_s+" gold."
+          prompt.yes?("Proceed?")
+        else
+          puts "Not enough gold!"
+          prompt.yes?("Proceed?")
+        end
+      end
+    end
     def respawn
       @pos_y=0
       @pos_x=0
@@ -121,24 +192,47 @@ module Player
     end
     def deal_damage(enemy)
       dmg=enemy.take_damage(@damage)
+      @stats.damage_dealt+=dmg
       dmg
     end
     def take_damage(dmg)
       if dmg<0 then dmg=0 end
+      @stats.damage_taken+=dmg
       @health=@health-dmg
       if @health<=0
         @dead = true
         @health = 0
       end
     end
+    def choose_quest(object)
+      prompt=TTY::Prompt.new
+      temp_dict={}
+      object.quests.each_with_index do |quest, i|
+        temp_dict[(i+1).to_s+". "+quest.name+" Description: "+quest.description]=quest
+      end
+      if temp_dict.size==0
+        puts "NO QUESTS AVAILABLE"
+        prompt.yes?("Proceed?")
+        return
+      end
+      selected=prompt.select("__Quests__", temp_dict)
+      choice_=prompt.select(selected, %w(Accept Back))
+      if choice_=="Accept"
+        self.accept_quest(selected)
+      end
+    end
     def accept_quest(quest)
-      @quests.add(quest)
+      @quests.append(quest)
+      quest.accept_quest(self)
+
     end
     def move_to (pos_x, pos_y)
-      if pos_x>=0 and pos_y>=0 and pos_x<Map::Base.height and pos_y<Map::Base.width and not Map::Base.check_collision(pos_x, pos_y) then
+      if States::Base.inside_margin?(pos_x, pos_y) and not Map::Base.check_collision(pos_x, pos_y) then
         @pos_x = pos_x
         @pos_y = pos_y
+        return true
       end
+      return false
     end
     def is_dead
       @dead
@@ -168,6 +262,8 @@ module Player
         if enemy.is_dead
           puts "\e[H\e[2J"
           puts "You won!"
+          @stats.kills+=1
+          @stats.killed.append(enemy)
 
           if enemy.is_a?(NPC::Enemy)
             puts "Gained 30XP and 100 gold!"
@@ -234,66 +330,16 @@ module Player
         end
       end
     end
-
-    def sell_item(object)
-      prompt=TTY::Prompt.new
-      temp_dict={}
-      self.inventory.slots.each_with_index do |item, i|
-        temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
+    def show_quests
+      @quests.each_with_index do |q, i| q
+        puts (i+1).to_s+". "+q.name+" Desc: "+q.description+" Steps: "+q.steps.to_s
       end
-      if temp_dict.size==0
-        puts "INVENTORY EMPTY"
-        prompt.yes?("Proceed?")
-        #krv_ti_jebem=1
-        return
-      end
-      selected=prompt.select("__Inventory__", temp_dict)
-      choice_=prompt.select(selected, %w(Sell Back))
-
-      if choice_=="Sell"
-        if object.inventory.gold-selected.gold>=0
-          self.gain_gold(selected.gold)
-          self.drop_item(selected)
-          object.inventory.lose_gold(selected.gold)
-          puts("Item sold, you gained "+selected.gold.to_s+" gold.")
-          prompt.yes?("Proceed?")
-        else
-          puts("The shop doesn't have enough funds")
-          prompt.yes?("Proceed?")
-        end
-      end
-    end
-
-    def buy_item(object)
-      prompt=TTY::Prompt.new
-      temp_dict={}
-      object.inventory.slots.each_with_index do |item, i|
-        temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
-      end
-      if temp_dict.size==0
-        puts "SHOP EMPTY"
-        prompt.yes?("Proceed?")
-        return
-      end
-      selected=prompt.select("__Shop inventory__", temp_dict)
-      choice_=prompt.select(selected, %w(Buy Back))
-
-      if choice_=="Buy"
-        if self.inventory.gold>=selected.gold
-          self.lose_gold(selected.gold)
-          self.take_item(selected)
-          puts "Item aquired, you spent "+selected.gold.to_s+" gold."
-          prompt.yes?("Proceed?")
-        else
-          puts "Not enough gold!"
-          prompt.yes?("Proceed?")
-        end
-      end
+      if @quests.size==0 then puts "No quests currently." end
+      TTY::Prompt.new.yes?("Proceed?")
     end
 
     def interact(object)
       if object.nil? then return end
-      #puts "\e[H\e[2J"
 
       object_x=object[1]
       object_y=object[2]
@@ -302,7 +348,7 @@ module Player
       puts object.attributes
 
       prompt = TTY::Prompt.new
-      choices = check_object_class(object)
+      choices = Player::Base.check_object_class(object)
 
       choice = prompt.select("Choose action", choices)
 
@@ -325,6 +371,9 @@ module Player
       elsif choice=="Sell"
         self.sell_item(object)
         return
+      elsif choice=="Quests"
+        object.display_quests
+        self.choose_quest(object)
       else
         States::Base.game(self)
         return
