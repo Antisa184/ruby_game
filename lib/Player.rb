@@ -23,7 +23,7 @@ module Player
     end
     def show
       @@atts=["Kills: "+@kills.to_s, "Gold collected: "+@gold_collected.to_s, "Gold spent: "+@gold_spent.to_s, "Items collected: "+@items_collected.to_s, "Steps taken: "+@steps.to_s,
-              "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s, "XP gained: "+@xp_gained.to_s, "Killed: "+@killed.to_s, "Items: "+@items.to_s]
+              "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s, "XP gained: "+@xp_gained.to_s]
 
       @@atts.each do |att|
       puts att
@@ -154,6 +154,7 @@ module Player
           prompt.yes?("Proceed?")
         else
           puts("The shop doesn't have enough funds")
+          puts object.attributes
           prompt.yes?("Proceed?")
         end
       end
@@ -332,7 +333,7 @@ module Player
     end
     def show_quests
       @quests.each_with_index do |q, i| q
-        puts (i+1).to_s+". "+q.name+" Desc: "+q.description+" Steps: "+q.steps.to_s
+        puts (i+1).to_s+". "+q.name+" Desc: "+q.description
       end
       if @quests.size==0 then puts "No quests currently." end
       TTY::Prompt.new.yes?("Proceed?")

@@ -13,10 +13,10 @@ module Item
       @id= id
       @name = name
       @description = description
-      @gold = gold,
+      @gold = gold
       @usable = usable
       @stackable = stackable
-      @count = count,
+      @count = count
       @item_type = item_type
       @rarity = rarity
       @equipped = equipped

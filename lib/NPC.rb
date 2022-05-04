@@ -105,7 +105,7 @@ module NPC
     def initialize(name, pos_x, pos_y, inventory, id = @@id_default)
       super(name, pos_x, pos_y, id)
       @inventory = inventory
-      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Inventory:\n"+@inventory.pretty_slots.to_s]
+      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Inventory:\n"+@inventory.pretty_slots.to_s, "\nGold: "+@inventory.gold.to_s]
 
     end
 
