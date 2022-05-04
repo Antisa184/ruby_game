@@ -6,7 +6,10 @@ module Inventory
     @@instances=[]
 
     def initialize(max_slots, slots, gold, id = @@id_default)
-      @id=id, @max_slots=max_slots, @slots=slots, @gold=gold
+      @id=id
+      @max_slots=max_slots
+      @slots=slots
+      @gold=gold
       if @id == @@id_default then @@id_default+=1 end
       @@count += 1
       @@instances << self

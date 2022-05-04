@@ -7,7 +7,12 @@ module Map
     attr_reader :width, :height, :map
 
     def initialize(name, width, height, objects, out, id = @@id_default)
-      @@id=id, @@name=name, @@width=width, @@height=height, @@objects=objects, @@out=out
+      @@id=id
+      @@name=name
+      @@width=width
+      @@height=height
+      @@objects=objects
+      @@out=out
       if @@id == @@id_default then @@id_default+=1 end
       @@count += 1
       @@instances << self
@@ -39,6 +44,7 @@ module Map
 
     def self.render(pos_x=0, pos_y=0, map_marker)
       x=0, y=0
+      #ENFORCING WINDOW SIZE AND DRAWING MAP
       if pos_x<10 then x=0
       elsif Map::Base.height-pos_x<10
         x=Map::Base.height-20
@@ -60,7 +66,7 @@ module Map
       return
     end
     def self.add_object(object,pos_x, pos_y)
-      if pos_x>=0 and pos_y>=0 and pos_x<Map::Base.height and pos_y<Map::Base.width then
+      if States::Base.inside_margin?(pos_x, pos_y) then
         @@objects.append([object, pos_x, pos_y])
         if object.is_a?(Item::Consumable) then
           @@map[pos_x][pos_y]="▓"

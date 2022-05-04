@@ -19,7 +19,7 @@ module States
     end
 
     def self.near_object(x, y)
-      if States::Base.inside_margin?(x, y) and States::Base.special_char?(x,y)
+      if inside_margin?(x, y) and special_char?(x,y)
         Map::Base.objects.each do |o|
           if o[1]==x and o[2]==y
             if @@object_count==1 then puts "To interact with object press the corresponding function key." end
@@ -39,10 +39,10 @@ module States
       #####CHECK IF PLAYER NEAR OBJECTS
       @@object_count=1
       @@objects_near=[]
-      if States::Base.near_object(player.pos_x-1, player.pos_y) then @@object_count+=1 end
-      if States::Base.near_object(player.pos_x+1, player.pos_y) then @@object_count+=1 end
-      if States::Base.near_object(player.pos_x, player.pos_y-1) then @@object_count+=1 end
-      if States::Base.near_object(player.pos_x, player.pos_y+1) then @@object_count+=1 end
+      if near_object(player.pos_x-1, player.pos_y) then @@object_count+=1 end
+      if near_object(player.pos_x+1, player.pos_y) then @@object_count+=1 end
+      if near_object(player.pos_x, player.pos_y-1) then @@object_count+=1 end
+      if near_object(player.pos_x, player.pos_y+1) then @@object_count+=1 end
 
     end
 

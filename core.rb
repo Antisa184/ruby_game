@@ -14,9 +14,11 @@ class Game
   def self.open_inventory(player)
     prompt=TTY::Prompt.new
     temp_dict={}
+    #PUT ALL PLAYERS ITEMS IN DICT
     player.inventory.slots.each_with_index do |item, i|
       temp_dict[(i+1).to_s+". "+item.name]=item
     end
+    #IF DICT EMPTY THEN INVENTORY EMPTY
     if temp_dict.size==0
       puts "INVENTORY EMPTY"
 
@@ -24,7 +26,7 @@ class Game
 
       return 1
     end
-    #puts temp_dict
+    #SELECT ITEM FROM INVENTORY
     selected=prompt.select("__Inventory__", temp_dict)
     puts selected
     if selected.item_type=="Consumable"
@@ -56,22 +58,27 @@ class Game
   end
   def self.view_weapon(player)
     prompt=TTY::Prompt.new
+
+    #IF WEAPON EQUIPPED
     if player.equipped_weapon!=nil
       puts player.equipped_weapon.name
       w=prompt.yes?("Unequip weapon?")
       if w
         player.unequip_weapon
       end
+    #IF WEAPON UNEQUIPPED
     else
       puts "No weapon equipped!"
       prompt.yes?("Proceed?")
     end
     return 1
   end
-
+  def self.create_player(name, marker)
+    Player::Stats.new
+    return Player::Base.new(name, 1, 0,100, 5, 2, 0, 0, false, [], Inventory::Base.new(10,[],500), nil, [], nil, marker, "asdf")
+  end
   def self.play(player)
     reset_reader=0
-    prompt = TTY::Prompt.new
     reader = TTY::Reader.new
     loop do
       puts "\e[H\e[2J"
@@ -124,6 +131,9 @@ class Game
         if event.value == "i" and reset_reader==0
           reset_reader=open_inventory(player)
         end
+        if event.value == "s" and reset_reader==0
+          reset_reader=Player::Stats.show
+        end
 
       end
 
@@ -158,7 +168,7 @@ class Game
   name=prompt.ask("Enter your name: ", default:"Ždero")
   marker = prompt.select("Please choose your map marker", %w(¿ ® ¥ ¤))
 
-  player = Player::Base.new(name, 1, 0,100, 5, 2, 0, 0, false, [], Inventory::Base.new(10,[],500), nil, [], nil, marker, "asdf")
-
+  #INITIALIZE PLAYER
+  player = create_player(name, marker)
   play(player)
 end

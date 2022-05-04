@@ -1,4 +1,28 @@
 module Player
+  class Stats
+    @@atts=["Kills: "+@kills.to_s, "Gold collected: "+@gold_collected.to_s, "Gold spent: "+@gold_spent.to_s, "Items collected: "+@items_collected.to_s, "Steps taken: "+@steps.to_s,
+           "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s]
+
+    def initialize(kills=0,gold_collected=0, gold_spent=0, items_collected=0, steps=0, damage_dealt=0, damage_taken=0, healed=0)
+      @kills=kills
+      @gold_collected=gold_collected
+      @gold_spent=gold_spent
+      @items_collected=items_collected
+      @steps=steps
+      @damage_dealt=damage_dealt
+      @damage_taken=damage_taken
+      @healed=healed
+      @@atts=["Kills: "+@kills.to_s, "Gold collected: "+@gold_collected.to_s, "Gold spent: "+@gold_spent.to_s, "Items collected: "+@items_collected.to_s, "Steps taken: "+@steps.to_s,
+             "Damage dealt: "+@damage_dealt.to_s, "Damage taken: "+@damage_taken.to_s, "Healed: "+@healed.to_s]
+    end
+    def self.show
+      @@atts.each do |att|
+      puts att
+      end
+      TTY::Prompt.new.yes?("Back")
+      return 1
+    end
+  end
   class Base
     @@count=0
     @@id_default=1
@@ -36,7 +60,6 @@ module Player
     def gain_xp(xp)
       @xp+=xp
       @level=Initialize::Base.determine_level(@xp)
-
     end
 
     def gain_gold(gold)
@@ -73,16 +96,16 @@ module Player
     end
     def use_item (item)
       #SMALL POTION
-      if item.id[0]==1
+      if item.id==1
         @health+=30
       #LARGE POTION
-      elsif item.id[0]==2
+      elsif item.id==2
         @health+=60
       #SMALL ARMOR
-      elsif item.id[0]==3
+      elsif item.id==3
         @armor+=2
       #LARGE ARMOR
-      elsif item.id[0]==4
+      elsif item.id==4
         @armor+=5
       end
 
@@ -279,7 +302,7 @@ module Player
       puts object.attributes
 
       prompt = TTY::Prompt.new
-      choices = Player::Base.check_object_class(object)
+      choices = check_object_class(object)
 
       choice = prompt.select("Choose action", choices)
 
