@@ -35,11 +35,7 @@ module Player
 
     def gain_xp(xp)
       @xp+=xp
-      if @xp>29 then @level=2 end
-      if @xp>50 then @level=3 end
-      if @xp>80 then @level=4 end
-      if @xp>120 then @level=5 end
-      if @xp>200 then @level=6 end
+      @level=Initialize::Base.determine_level(@xp)
 
     end
 
@@ -55,6 +51,7 @@ module Player
     def equip_weapon (weapon)
       if @equipped_weapon!=nil
         self.take_item(@equipped_weapon)
+        @equipped_weapon=nil
       end
       @equipped_weapon = weapon
       @damage = weapon.damage
@@ -83,14 +80,6 @@ module Player
         @armor+=5
       end
 
-    end
-    def sell_item (item)
-      @inventory.gain_gold(item.gold)
-      self.drop_item(item)
-    end
-    def buy_item (item)
-      @inventory.lose_gold(item.gold)
-      self.take_item(item)
     end
     def drop_item (item)
       @inventory.item_remove(item)
@@ -125,149 +114,185 @@ module Player
     def is_dead
       @dead
     end
+    def fight(enemy, object_x, object_y)
+      prompt=TTY::Prompt.new
+      loop do
+        parry=false
+        puts "\n\n"+@name+"("+@health.to_s+")"" vs "+enemy.name+"("+enemy.health.to_s+")"+"\n\n"
+
+        action = prompt.select("Choose action", %w(Attack Parry Escape))
+
+        #PLAYER'S TURN
+        if action=="Attack"
+          puts "\e[H\e[2J"
+          dmg=deal_damage(enemy)
+          puts "You dealt "+dmg.to_s+" DMG."
+          puts "Enemy has "+enemy.health.to_s+" HP remaining."
+
+        elsif action=="Parry"
+          parry=true
+        else
+          States::Base.game(self)
+          return
+        end
+
+        if enemy.is_dead
+          puts "\e[H\e[2J"
+          puts "You won!"
+
+          if enemy.is_a?(NPC::Enemy)
+            puts "Gained 30XP and 100 gold!"
+            prompt.yes?("Proceed?")
+            self.gain_xp(30)
+            self.gain_gold(100)
+          else
+            puts "Gained 120XP and 500 gold!"
+            prompt.yes?("Proceed?")
+            self.gain_xp(120)
+            self.gain_gold(500)
+          end
+
+          Map::Base.change_pixel(object_x,object_y,".")
+          States::Base.game(self)
+          return
+        end
+
+        #ENEMY TURN
+        dmg = enemy.deal_damage(self, parry)
+        puts "You recieved "+dmg.to_s+" DMG."
+        puts "You have "+@health.to_s+" HP remaining."
+        if self.is_dead
+          choice=prompt.select("YOU DIED", %w(Respawn Quit))
+          if choice=="Respawn"
+            self.respawn
+            return
+          else
+            puts "Exiting"
+            exit
+          end
+        end
+      end
+    end
+
+    def self.check_object_class(object)
+      if object.is_a?(NPC::Enemy) or object.is_a?(NPC::EnemyBoss)
+        choices = %w(Fight Back)
+      end
+      if object.is_a?(Item::Consumable) or object.is_a?(Item::Weapon)
+        choices = %w(Take Use Back)
+      end
+      if object.is_a?(NPC::QuestGiver)
+        choices = %w(Quests Back)
+      end
+      if object.is_a?(NPC::Shop)
+        choices = %w(Buy Sell Back)
+      end
+      choices
+    end
+
+    def determine_type_and_use(object, object_x, object_y, prompt)
+      if object.item_type=="Consumable"
+        self.use_item(object)
+        Map::Base.change_pixel(object_x,object_y,".")
+      else
+        if object.req_lvl<=self.level
+          self.equip_weapon(object)
+          Map::Base.change_pixel(object_x,object_y,".")
+        else
+          puts "You need to be at least level "+object.req_lvl.to_s+" to use this."
+          prompt.yes?("Proceed?")
+        end
+      end
+    end
+
+    def sell_item(object, prompt)
+      temp_dict={}
+      self.inventory.slots.each_with_index do |item, i|
+        temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
+      end
+      if temp_dict.size==0
+        puts "INVENTORY EMPTY"
+        prompt.yes?("Proceed?")
+        #krv_ti_jebem=1
+        return
+      end
+      selected=prompt.select("__Inventory__", temp_dict)
+      choice_=prompt.select(selected, %w(Sell Back))
+
+      if choice_=="Sell"
+        if object.inventory.gold-selected.gold>=0
+          self.gain_gold(selected.gold)
+          self.drop_item(selected)
+          object.inventory.lose_gold(selected.gold)
+          puts("Item sold, you gained "+selected.gold.to_s+" gold.")
+          prompt.yes?("Proceed?")
+        else
+          puts("The shop doesn't have enough funds")
+          prompt.yes?("Proceed?")
+        end
+      end
+    end
+
+    def buy_item(object, prompt)
+      temp_dict={}
+      object.inventory.slots.each_with_index do |item, i|
+        temp_dict[(i+1).to_s+". "+item.name+" Gold: "+item.gold.to_s]=item
+      end
+      if temp_dict.size==0
+        puts "SHOP EMPTY"
+        prompt.yes?("Proceed?")
+        return
+      end
+      selected=prompt.select("__Shop inventory__", temp_dict)
+      choice_=prompt.select(selected, %w(Buy Back))
+
+      if choice_=="Buy"
+        if self.inventory.gold>=selected.gold
+          self.lose_gold(selected.gold)
+          self.take_item(selected)
+          puts "Item aquired, you spent "+selected.gold.to_s+" gold."
+          prompt.yes?("Proceed?")
+        else
+          puts "Not enough gold!"
+          prompt.yes?("Proceed?")
+        end
+      end
+    end
+
     def interact(object)
       if object.nil? then return end
       #puts "\e[H\e[2J"
-      puts object[0].attributes
+
+      object_x=object[1]
+      object_y=object[2]
+      object=object[0]
+
+      puts object.attributes
 
       prompt = TTY::Prompt.new
-      if object[0].is_a?(NPC::Enemy) or object[0].is_a?(NPC::EnemyBoss)
-        choices = %w(Fight Back)
-      end
-      if object[0].is_a?(Item::Consumable) or object[0].is_a?(Item::Weapon)
-        choices = %w(Take Use Back)
-      end
-      if object[0].is_a?(NPC::QuestGiver)
-        choices = %w(Quests Back)
-      end
-      if object[0].is_a?(NPC::Shop)
-        choices = %w(Buy Sell Back)
-      end
+      choices = Player::Base.check_object_class(object)
 
-      choice = prompt.multi_select("Choose action", choices)
+      choice = prompt.select("Choose action", choices)
 
-      if choice[0]=="Fight" then
-        loop do
-          parry=false
-          puts "\n\n"+@name+"("+@health.to_s+")"" vs "+object[0].name+"("+object[0].health.to_s+")"+"\n\n"
-          choices = %w(Attack Parry Escape)
-          action = prompt.multi_select("Choose action", choices)
-
-          #PLAYER'S TURN
-          if action[0]=="Attack"
-            puts "\e[H\e[2J"
-            dmg=deal_damage(object[0])
-            puts "You dealt "+dmg.to_s+" DMG."
-            puts "Enemy has "+object[0].health.to_s+" HP remaining."
-
-          elsif action[0]=="Parry"
-            parry=true
-          else
-            States::Base.game(self)
-            return
-          end
-
-          if object[0].is_dead
-            puts "\e[H\e[2J"
-            puts "You won!"
-
-            if object[0].is_a?(NPC::Enemy)
-              puts "Gained 30XP and 100 gold!"
-              prompt.yes?("Proceed?")
-              self.gain_xp(30)
-              self.gain_gold(100)
-            else
-              puts "Gained 120XP and 500 gold!"
-              prompt.yes?("Proceed?")
-              self.gain_xp(120)
-              self.gain_gold(500)
-            end
-
-            Map::Base.change_pixel(object[1],object[2],".")
-            States::Base.game(self)
-            return
-          end
-
-          #ENEMY TURN
-          dmg = object[0].deal_damage(self, parry)
-          puts "You recieved "+dmg.to_s+" DMG."
-          puts "You have "+@health.to_s+" HP remaining."
-          if self.is_dead
-            choice=prompt.select("YOU DIED", %w(Respawn Quit))
-            if choice=="Respawn"
-              self.respawn
-              return
-            else
-              puts "Exiting"
-              exit
-            end
-          end
-        end
-
-      elsif choice[0]=="Take"
-        self.take_item(object[0])
-        prompt.yes?("Proceed?")
-        Map::Base.change_pixel(object[1],object[2],".")
+      if choice=="Fight" then
+        self.fight(object, object_x, object_y)
         return
-      elsif choice[0]=="Use"
-        if object[0].item_type=="Consumable"
-          self.use_item(object[0])
-          Map::Base.change_pixel(object[1],object[2],".")
-        else
-          if object[0].req_lvl<=self.level
-            self.equip_weapon(object[0])
-            Map::Base.change_pixel(object[1],object[2],".")
-          else
-            puts "You need to be at least level "+object[0].req_lvl.to_s+" to use this."
-            prompt.yes?("Proceed?")
-          end
 
-        end
-      elsif choice[0]=="Buy"
-        temp_dict={}
-        object[0].inventory.slots.each_with_index do |item, i|
-          temp_dict[(i+1).to_s+". "+item.name]=item
-        end
-        if temp_dict.size==0
-          puts "SHOP EMPTY"
-          prompt.yes?("Proceed?")
-          #krv_ti_jebem=1
-          return
-        end
-        selected=prompt.multi_select("__Shop inventory__", temp_dict)
-        choice_=prompt.select(selected[0], %w(Buy Back))
+      elsif choice=="Take"
+        self.take_item(object)
+        prompt.yes?("Proceed?")
+        Map::Base.change_pixel(object_x,object_y,".")
+        return
 
-        if choice_=="Buy"
-          if self.inventory.gold>=selected[0].gold
-            self.lose_gold(selected[0].gold)
-            self.take_item(selected[0])
-            puts "Item aquired, you spent "+selected[0].gold.to_s+" gold."
-            prompt.yes?("Proceed?")
-          else
-            puts "Not enough gold!"
-            prompt.yes?("Proceed?")
-          end
-        end
-      elsif choice[0]=="Sell"
-        temp_dict={}
-        self.inventory.slots.each_with_index do |item, i|
-          temp_dict[(i+1).to_s+". "+item.name]=item
-        end
-        if temp_dict.size==0
-          puts "INVENTORY EMPTY"
-          prompt.yes?("Proceed?")
-          #krv_ti_jebem=1
-          return
-        end
-        selected=prompt.multi_select("__Inventory__", temp_dict)
-        choice_=prompt.select(selected[0], %w(Sell Back))
-
-        if choice_=="Sell"
-          self.gain_gold(selected[0].gold)
-          self.drop_item(selected[0])
-          puts("Item sold, you gained "+selected[0].gold.to_s+" gold.")
-          prompt.yes?("Proceed?")
-        end
+      elsif choice=="Use"
+        self.determine_type_and_use(object, object_x, object_y, prompt)
+        return
+      elsif choice=="Buy"
+        self.buy_item(object,prompt)
+        return
+      elsif choice=="Sell"
+        self.sell_item(object, prompt)
+        return
       else
         States::Base.game(self)
         return

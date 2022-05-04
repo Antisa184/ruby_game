@@ -1,0 +1,8 @@
+PlayerStats keeps count of all kills, all gold collected, gold spent, all items collected, steps walked, damage dealt, damage taken,...
+
+Quests are formed by key multiple key words.
+1. *action* Kill, Acquire, Spend, Gain, Walk, Deal
+2. *amount* 5, 500, 100, 50, 30, 150
+3. *object* Enemies, Gold, XP, Steps, Damage
+
+Game checks if quest is complete by PlayerStats

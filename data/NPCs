@@ -1,0 +1,6 @@
+Enemy;Đuro;25;15;5;2;35;10;Small Health potion,Restores 30 HP,25,true,true,1,Consumable,1,false,Restore 30 HP,1;20;1001;false;E;asdf;3
+Enemy;Đuro;25;15;5;2;35;10;Small Health potion,Restores 30 HP,25,true,true,1,Consumable,1,false,Restore 30 HP,1;20;1002;false;E;asdf;3
+Enemy;Đuro;25;15;5;2;35;10;Small Health potion,Restores 30 HP,25,true,true,1,Consumable,1,false,Restore 30 HP,1;20;1003;false;E;asdf;3
+Enemy;Đuro;25;15;5;2;35;10;Small Health potion,Restores 30 HP,25,true,true,1,Consumable,1,false,Restore 30 HP,1;20;1004;false;E;asdf;3
+EnemyBoss;Đurisimus;15;35;25;12;75;10;Large Health potion,Restores 60 HP,40,true,true,1,Consumable,2,false,Restore 60 HP,2|Better Dagger,Small sharp knife,120,true,false,1,Weapon,3,false,40,3,2;300;1101;false;Đ;asdf;1
+Shop;Studenac;10;20;10;Small Health potion,Restores 30 HP,25,true,true,1,Consumable,1,false,Restore 30 HP,1|Large Health potion,Restores 60 HP,40,true,true,1,Consumable,2,false,Restore 60 HP,2|Common Dagger,Small knife,50,true,false,1,Weapon,1,false,20,1,1|Better Dagger,Small sharp knife,120,true,false,1,Weapon,3,false,40,3,2;5000;1337;1

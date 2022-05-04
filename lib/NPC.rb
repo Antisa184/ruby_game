@@ -30,7 +30,7 @@ module NPC
       super(name, pos_x, pos_y, id)
       @damage=damage, @armor=armor, @health=health, @inventory=inventory
       @dead=dead, @map_marker=map_marker, @image=image
-      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Damage: "+@damage.to_s, "Armor: "+@armor.to_s, "Health: "+@health.to_s,"Inventory: "+@inventory.to_s, "Dead: "+@dead.to_s, "Map marker: "+@map_marker.to_s]
+      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id[0].to_s, "Damage: "+@damage[0].to_s, "Armor: "+@armor.to_s, "Health: "+@health.to_s,"Inventory: "+@inventory.slots.to_s, "Dead: "+@dead[0].to_s, "Map marker: "+@map_marker.to_s]
     end
     def is_dead
       if @dead.is_a?(Array)
@@ -67,7 +67,7 @@ module NPC
       super(name, pos_x, pos_y, id)
       @damage=damage, @armor=armor, @health=health, @inventory=inventory
       @dead=dead, @map_marker=map_marker, @image=image
-      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Damage: "+@damage.to_s, "Armor: "+@armor.to_s, "Health: "+@health.to_s,"Inventory: "+@inventory.to_s, "Dead: "+@dead.to_s, "Map marker: "+@map_marker.to_s]
+      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id[0].to_s, "Damage: "+@damage[0].to_s, "Armor: "+@armor.to_s, "Health: "+@health.to_s,"Inventory: "+@inventory.slots.to_s, "Dead: "+@dead[0].to_s, "Map marker: "+@map_marker.to_s]
 
     end
     def is_dead
@@ -101,7 +101,7 @@ module NPC
     def initialize(name, pos_x, pos_y, inventory, id = @@id_default)
       super(name, pos_x, pos_y, id)
       @inventory = inventory
-      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Inventory: "+@inventory.to_s]
+      @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id[0].to_s, "Inventory:\n"+@inventory.pretty_slots.to_s]
 
     end
 
@@ -116,9 +116,9 @@ module NPC
       @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Quests: "+@quests.to_s]
     end
     def display_quests
-      #@quests.each_with_index do |quest, i | quest
-      #puts i+". "+quest.name+" Description: "+quest.
-      #end
+      @quests.each_with_index do |quest, i | quest
+        puts i+". "+quest.name+" Description: "+quest.description
+      end
     end
   end
 

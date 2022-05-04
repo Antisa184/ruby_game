@@ -20,13 +20,16 @@ module Inventory
     end
 
     def pretty_slots
+      slots_string=""
       @slots.each_with_index do |item, i| item
+        slots_string+=(i+1).to_s+". "+item.attributes.to_s+"\n"
         puts (i+1).to_s+". "+item.attributes.to_s
       end
+      slots_string
     end
     def reset_inv
       @slots=[]
-      @gold=[]
+      @gold=0
     end
 
     def gain_gold(gold)

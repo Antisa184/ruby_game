@@ -1,21 +1,25 @@
 module States
   class Base
-
-
+    def self.inside_margin?(x, y)
+      x>=0 and x<Map::Base.height and y>=0 and y<Map::Base.width
+    end
+    def self.special_char?(x, y)
+      "▓░©®EĐ€".include? Map::Base.entire_map[x][y]
+    end
     def self.main_menu
       prompt=TTY::Prompt.new
       choices = %w(Inventory Back Exit)
-      results = prompt.multi_select("__Menu__", choices)
-      if results.first()=='Back'
-      elsif results.first()=='Exit'
+      results = prompt.select("__Menu__", choices)
+      if results=='Back'
+      elsif results=='Exit'
         puts 'Exiting'
         exit
-      elsif results.first()=='Inventory'
+      elsif results=='Inventory'
       end
     end
 
     def self.near_object(x, y)
-      if x>=0 and x<Map::Base.height and y>=0 and y<Map::Base.width and "▓░©®EĐ€".include? Map::Base.entire_map[x][y]
+      if States::Base.inside_margin?(x, y) and States::Base.special_char?(x,y)
         Map::Base.objects.each do |o|
           if o[1]==x and o[2]==y
             if @@object_count==1 then puts "To interact with object press the corresponding function key." end

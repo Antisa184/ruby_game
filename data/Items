@@ -1,0 +1,8 @@
+Small Health potion;Restores 30 HP;25;true;true;1;Consumable;1;false;Restore 30 HP;1
+Small Health potion;Restores 30 HP;25;true;true;1;Consumable;1;false;Restore 30 HP;1
+Large Health potion;Restores 60 HP;40;true;true;1;Consumable;2;false;Restore 60 HP;2
+Large Health potion;Restores 60 HP;40;true;true;1;Consumable;2;false;Restore 60 HP;2
+Common Dagger;Small knife;50;true;false;1;Weapon;1;false;20;1;1
+Common Dagger;Small knife;50;true;false;1;Weapon;1;false;20;1;1
+Better Dagger;Small sharp knife;120;true;false;1;Weapon;3;false;40;3;2
+Better Dagger;Small sharp knife;120;true;false;1;Weapon;3;false;40;3;2
