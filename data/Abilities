@@ -1,0 +1,5 @@
+Basic attack,5,Deal Base DMG
+Special attack,10,Deal Base DMG + 50% CRIT
+Double slap,10,Deal #{player.damage*2} DMG
+Heal me,10,Heal 10 HP
+Big heal,20,Heal 50% HP

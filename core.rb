@@ -85,7 +85,9 @@ class Game
   end
   def self.create_player(name, marker)
     stats=Player::Stats.new
-    return Player::Base.new(name, 1, 0,100, 5, 2, 0, 0, false, [], Inventory::Base.new(10,[],500), nil, [], nil, marker, "asdf", stats, 123)
+    player = Player::Base.new(name, 1, 0,100, 5, 2, 0, 0, false, [], Inventory::Base.new(10,[],500), nil, [], nil, marker, "asdf", stats, 123)
+    player.abilities=Initialize::Base.load_abilities([], File.open(File.join(Dir.pwd,"/data/Abilities")))
+    return player
   end
   def self.play(player)
     reset_reader=0

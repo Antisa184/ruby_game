@@ -48,6 +48,14 @@ module Initialize
       end
       return objects
     end
+    def self.load_abilities(objects, file)
+      file.each do |line|
+        lineSplit = line.split(",")
+        ability=Abilities::Base.new(lineSplit[0], lineSplit[1].to_i,lineSplit[2][0...-1])
+        objects.append(ability)
+      end
+      objects
+    end
     def self.determine_level(xp)
       File.open(File.join(Dir.pwd,"/data/levels")).each do |line|
         if xp<line.split(",")[0].to_i then return line.split(",")[1].to_i end

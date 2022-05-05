@@ -38,7 +38,8 @@ module Player
     @@id_default=1
     @@instances=[]
 
-    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory, :stats, :quests
+    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory, :stats, :quests, :abilities
+    attr_writer :damage, :health, :abilities
 
     def initialize(name, level, xp, health, damage, armor, pos_x, pos_y, dead, quests, inventory, equipped_weapon, abilities, interacting_with, map_marker, image, stats, id = @@id_default)
       @id = id
@@ -78,13 +79,16 @@ module Player
       @inventory.gain_gold(gold)
       @stats.gold_collected+=gold
     end
+
     def lose_gold(gold)
       @inventory.lose_gold(gold)
       @stats.gold_spent+=gold
     end
+
     def self.count
       @@count
     end
+
     def equip_weapon (weapon)
       if weapon.req_lvl>self.level
         puts "You need to be level "+weapon.req_lvl.to_s+" to use this weapon."
@@ -98,16 +102,19 @@ module Player
       @equipped_weapon = weapon
       @damage = weapon.damage
     end
+
     def unequip_weapon
       self.take_item(@equipped_weapon)
       @equipped_weapon = nil
       @damage = 5
     end
+
     def take_item (item)
       @inventory.item_add(item)
       @stats.items_collected+=1
       @stats.items.append(item)
     end
+
     def use_item (item)
       @stats.items_collected+=1
       @stats.items.append(item)
@@ -128,9 +135,11 @@ module Player
       end
 
     end
+
     def drop_item (item)
       @inventory.item_remove(item)
     end
+
     def sell_item(object)
       prompt=TTY::Prompt.new
       temp_dict={}
@@ -159,6 +168,7 @@ module Player
         end
       end
     end
+
     def buy_item(object)
       prompt=TTY::Prompt.new
       temp_dict={}
@@ -185,18 +195,13 @@ module Player
         end
       end
     end
-    def respawn
-      @pos_y=0
-      @pos_x=0
-      @inventory.reset_inv
-      @health=100
-      @dead=false
-    end
+
     def deal_damage(enemy)
       dmg=enemy.take_damage(@damage)
       @stats.damage_dealt+=dmg
       dmg
     end
+
     def take_damage(dmg)
       if dmg<0 then dmg=0 end
       @stats.damage_taken+=dmg
@@ -206,6 +211,7 @@ module Player
         @health = 0
       end
     end
+
     def choose_quest(object)
       prompt=TTY::Prompt.new
       temp_dict={}
@@ -223,11 +229,36 @@ module Player
         self.accept_quest(selected)
       end
     end
+
     def accept_quest(quest)
       @quests.append(quest)
       quest.accept_quest(self)
 
     end
+
+    def add_ability(ability)
+      @abilities.append(ability)
+    end
+    def command_substitution(ability)
+      #IF COMMAND CONTAINS EXPRESSION SUBSTITUTION
+      if ability.command.split(" ")[1].start_with?("#")
+        ability.command=ability.command.split(" ")
+        ability.command[1]=ability.command[1][16...-1].to_i*self.damage
+        ability.command=ability.command.join(" ")
+      end
+      ability
+    end
+    def list_abilities
+      temp_dict={}
+      @abilities.each_with_index do |ability, i | ability
+        ability=command_substitution(ability)
+        temp_dict[(i+1).to_s+". "+ability.name+" Desc: "+ability.command.to_s]=ability
+      end
+
+      selected=TTY::Prompt.new.select("Choose ability", temp_dict)
+      return selected
+    end
+
     def move_to (pos_x, pos_y)
       if States::Base.inside_margin?(pos_x, pos_y) and not Map::Base.check_collision(pos_x, pos_y) then
         @pos_x = pos_x
@@ -236,9 +267,19 @@ module Player
       end
       return false
     end
+
     def is_dead
       @dead
     end
+
+    def respawn
+      @pos_y=0
+      @pos_x=0
+      @inventory.reset_inv
+      @health=100
+      @dead=false
+    end
+
     def fight(enemy, object_x, object_y)
       prompt=TTY::Prompt.new
       loop do
@@ -250,9 +291,9 @@ module Player
         #PLAYER'S TURN
         if action=="Attack"
           puts "\e[H\e[2J"
-          dmg=deal_damage(enemy)
-          puts "You dealt "+dmg.to_s+" DMG."
-          puts "Enemy has "+enemy.health.to_s+" HP remaining."
+
+          choice=self.list_abilities
+          choice.use_ability(self, enemy)
 
         elsif action=="Parry"
           parry=true
@@ -332,6 +373,7 @@ module Player
         end
       end
     end
+
     def show_quests
       @quests.each_with_index do |q, i| q
         puts (i+1).to_s+". "+q.name+" Desc: "+q.description
