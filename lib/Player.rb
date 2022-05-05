@@ -284,6 +284,8 @@ module Player
       prompt=TTY::Prompt.new
       loop do
         parry=false
+
+        #LISTS PLAYER'S AND ENEMY'S HP
         puts "\n\n"+@name+"("+@health.to_s+")"" vs "+enemy.name+"("+enemy.health.to_s+")"+"\n\n"
 
         action = prompt.select("Choose action", %w(Attack Parry Escape))
@@ -302,6 +304,7 @@ module Player
           return
         end
 
+        #CHECK IF ENEMY DEAD
         if enemy.is_dead
           puts "\e[H\e[2J"
           puts "You won!"

@@ -15,9 +15,12 @@ module Abilities
       if @command[0]=="Deal"
         crit=0
         bonus=0
+
+        #CHECK FOR EXPRESSION SUBSTITUTION
         if @command[1].start_with?("#")
           @command[1]=@command[1][16...-1].to_i*player.damage
         end
+        #CHECK FOR BONUS DAMAGE OR CRIT
         if @command[3]=="+"
           if @command[4].end_with?("%")
             percent=@command[4][0...-1].to_f/100
