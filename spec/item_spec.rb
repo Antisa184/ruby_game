@@ -1,4 +1,5 @@
 require 'rspec'
+require 'spec_helper'
 
 describe 'Item' do
   before do
@@ -11,7 +12,7 @@ describe 'Item' do
 
   context 'when condition' do
     it 'succeeds' do
-      pending 'Not implemented'
+
     end
   end
 end

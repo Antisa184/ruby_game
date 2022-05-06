@@ -670,7 +670,7 @@ module Player
 end
 module Map
   class Base
-    @@map=[]
+    @@map=["####","####","####","####"]
     @@count=0
     @@id_default=1
     @@instances=[]
@@ -743,7 +743,7 @@ module Map
       restricted.each_with_index do |line, index|
         puts line[y,20]
       end
-      return
+      return restricted
     end
     def self.add_object(object,pos_x, pos_y)
       if States::Base.inside_margin?(pos_x, pos_y) then
