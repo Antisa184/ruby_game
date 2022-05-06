@@ -50,7 +50,7 @@ module Quest
           count=0
           player.stats.killed.each_with_index do |mob, i| mob
           #puts mob.class
-          if i<@killed.size then next end
+            if i<@killed.size then next end
             if mob.class.to_s=="NPC::Enemy" then count+=1 end
           end
           #puts count
