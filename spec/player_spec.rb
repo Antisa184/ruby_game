@@ -36,7 +36,7 @@ describe 'Player::Base' do
 88888888888888888:':..:':..:':.88888888888888888':..:':..:':..:':..:':."
     @entire_map=@entire_map.split("\n")
     Map::Base.load_map(@entire_map)
-    @player = Player::Base.new("Player", 1, 0,100, 5, 2, 0, 0, false, [], Inventory::Base.new(10, [], 100, 123), nil, [], nil, "P", "asdf", Player::Stats.new, 123)
+    @player = Player::Base.new
   end
 
   after do
@@ -72,7 +72,7 @@ describe 'Player::Base' do
 
   context 'when equip_weapon' do
     before(:example) do
-      @weapon=Item::Weapon.new("Weapon", "Desc", 100, true, false, 1, "Weapon", 1, false, 10, 1, 123)
+      @weapon=Item::Weapon.new
 
       @player.equip_weapon(@weapon)
     end
@@ -83,8 +83,8 @@ describe 'Player::Base' do
     end
     context 'when req_lvl high' do
       before(:example) do
-        @prompt = TTY::Prompt.new
-        @weapon_high=Item::Weapon.new("Weapon", "Desc", 100, true, false, 1, "Weapon", 1, false, 10, 3, 123)
+        @weapon_high=Item::Weapon.new
+        @weapon_high.req_lvl=3
       end
       it 'returns message' do
         expect{@player.equip_weapon(@weapon_high)}.to output("You need to be level "+@weapon_high.req_lvl.to_s+" to use this weapon.\n").to_stdout
@@ -94,7 +94,7 @@ describe 'Player::Base' do
 
   context 'when take_item' do
     before(:example) do
-      @item = Item::Base.new("Item", "Desc", 100, true, true, 1, "Item_type", 1, false, 123)
+      @item = Item::Base.new
       @player.take_item(@item)
     end
     it 'has 1 item in inventory' do
@@ -125,7 +125,7 @@ describe 'Player::Base' do
   end
   context 'when accept_quest' do
     before (:example) do
-      @quest = Quest::Base.new("Quest", "Desc", "Command", 100, 100)
+      @quest = Quest::Base.new
       @player.accept_quest(@quest)
     end
     it 'has 1 quest in Quests' do
@@ -144,7 +144,7 @@ describe 'Player::Base' do
 
   context 'when deal_damage' do
     before (:example) do
-      @enemy=NPC::Enemy.new("Enemy", 1, 1, 10, 2, 100, Inventory::Base.new(10, [], 100, 123), false, "E", "asdf", 123)
+      @enemy=NPC::Enemy.new
     end
     it 'takes damage' do
       expect(@player.deal_damage(@enemy)).to eq(3)
@@ -153,7 +153,7 @@ describe 'Player::Base' do
 
   context 'when accept_quest' do
     before (:example) do
-      @quest = Quest::Base.new("Quest", "Desc", "Command", 100, 100)
+      @quest = Quest::Base.new
       @player.accept_quest(@quest)
     end
     it 'has 1 quest in Quests' do
@@ -172,7 +172,7 @@ describe 'Player::Base' do
 
   context 'when add_ability' do
     before (:example) do
-      @ability = Abilities::Base.new("Ability", 3, "Deal 3 DMG")
+      @ability = Abilities::Base.new
       @player.add_ability(@ability)
     end
     it 'has 1 quest in Quests' do

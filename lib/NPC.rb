@@ -29,7 +29,7 @@ module NPC
   end
   class Enemy < Base
     attr_accessor :health, :damage, :map_marker
-    def initialize(name="Enemy", pos_x=0, pos_y=0, damage=5, armor=2, health=30, inventory=Inventory::Base.new, dead=false, map_marker="E", image="ASDF", id = @@id_default)
+    def initialize(name="Enemy", pos_x=0, pos_y=0, damage=10, armor=2, health=30, inventory=Inventory::Base.new, dead=false, map_marker="E", image="ASDF", id = @@id_default)
       super(name, pos_x, pos_y, id)
       @damage=damage
       @armor=armor
