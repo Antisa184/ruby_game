@@ -2,8 +2,22 @@ GEM
   remote: https://rubygems.org/
   specs:
     dead_end (3.1.1)
+    diff-lcs (1.5.0)
     pastel (0.8.0)
       tty-color (~> 0.5)
+    rspec (3.11.0)
+      rspec-core (~> 3.11.0)
+      rspec-expectations (~> 3.11.0)
+      rspec-mocks (~> 3.11.0)
+    rspec-core (3.11.0)
+      rspec-support (~> 3.11.0)
+    rspec-expectations (3.11.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.11.0)
+    rspec-mocks (3.11.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.11.0)
+    rspec-support (3.11.0)
     tty-color (0.6.0)
     tty-cursor (0.7.1)
     tty-prompt (0.23.1)
@@ -21,6 +35,7 @@ PLATFORMS
 
 DEPENDENCIES
   dead_end
+  rspec
   tty-prompt
   tty-reader
 

@@ -38,7 +38,7 @@ module Player
     @@id_default=1
     @@instances=[]
 
-    attr_reader :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory, :stats, :quests, :abilities
+    attr_reader :name, :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory, :stats, :quests, :abilities
     attr_writer :damage, :health, :abilities
 
     def initialize(name, level, xp, health, damage, armor, pos_x, pos_y, dead, quests, inventory, equipped_weapon, abilities, interacting_with, map_marker, image, stats, id = @@id_default)
