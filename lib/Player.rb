@@ -41,7 +41,7 @@ module Player
     attr_reader :name, :pos_x, :pos_y, :map_marker, :health, :equipped_weapon, :xp, :level, :damage, :armor, :inventory, :stats, :quests, :abilities
     attr_writer :damage, :health, :abilities
 
-    def initialize(name, level, xp, health, damage, armor, pos_x, pos_y, dead, quests, inventory, equipped_weapon, abilities, interacting_with, map_marker, image, stats, id = @@id_default)
+    def initialize(name="Player", level=1, xp=0, health=100, damage=5, armor=2, pos_x=0, pos_y=0, dead=false, quests=[], inventory=Inventory::Base.new, equipped_weapon=nil, abilities=[], interacting_with=nil, map_marker="P", image="ASDF", stats=Player::Stats.new, id = @@id_default)
       @id = id
       if @id == @@id_default then @@id_default+=1 end
       @name = name

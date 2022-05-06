@@ -5,7 +5,7 @@ module Quest
     @@id_default=1
     @@instances=[]
 
-    def initialize(name, description, command, reward_gold, reward_xp)
+    def initialize(name="Quest", description="Desc", command="Do something", reward_gold=10, reward_xp=10)
       @name=name
       @description=description
       @command=command

@@ -5,7 +5,7 @@ module Inventory
     @@id_default=1
     @@instances=[]
 
-    def initialize(max_slots, slots, gold, id = @@id_default)
+    def initialize(max_slots=10, slots=[], gold=100, id = @@id_default)
       @id=id
       @max_slots=max_slots
       @slots=slots

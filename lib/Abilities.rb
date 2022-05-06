@@ -3,7 +3,7 @@ module Abilities
 
     attr_accessor :name, :damage, :command
 
-    def initialize(name, damage, command)
+    def initialize(name="Ability", damage=1, command="Deal 5 damage")
       @name=name
       @damage=damage
       @command=command

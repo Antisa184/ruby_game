@@ -9,7 +9,7 @@ module Item
       @atts
     end
 
-    def initialize(name, description, gold, usable, stackable, count, item_type, rarity, equipped, id = @@id_default)
+    def initialize(name="Item", description="Desc", gold=10, usable=true, stackable=true, count=1, item_type="Item", rarity=1, equipped=false, id = @@id_default)
       @id= id
       @name = name
       @description = description
@@ -43,9 +43,8 @@ module Item
       @atts
     end
 
-    def initialize(name, description, gold, usable, stackable,
-                   count, item_type, rarity, equipped,
-                   damage, req_lvl, id = @@id_default)
+    def initialize(name="Item", description="Desc", gold=10, usable=true, stackable=true, count=1, item_type="Item", rarity=1, equipped=false,
+                   damage=10, req_lvl=1, id = @@id_default)
 
       super(name, description, gold, usable, stackable,
             count, item_type, rarity, equipped, id)
@@ -64,9 +63,8 @@ module Item
       @atts
     end
 
-    def initialize(name, description, gold, usable, stackable,
-                   count, item_type, rarity, equipped,
-                   on_use, id = @@id_default)
+    def initialize(name="Item", description="Desc", gold=10, usable=true, stackable=true, count=1, item_type="Item", rarity=1, equipped=false,
+                   on_use="Do something", id = @@id_default)
 
       super(name, description, gold, usable, stackable,
             count, item_type, rarity, equipped, id)

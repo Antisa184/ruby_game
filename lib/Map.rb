@@ -1,6 +1,6 @@
 module Map
   class Base
-    @@map=[]
+    @@map=["####","####","####","####"]
     @@count=0
     @@id_default=1
     @@instances=[]
@@ -10,7 +10,7 @@ module Map
     @@prev_y=0
     attr_reader :width, :height, :map
 
-    def initialize(name, width, height, objects, out, id = @@id_default)
+    def initialize(name="Map", width=4, height=4, objects=[], out=1, id = @@id_default)
       @@id=id
       @@name=name
       @@width=width

@@ -9,7 +9,7 @@ module NPC
     end
 
     attr_reader :pos_x, :pos_y, :name
-    def initialize(name, pos_x, pos_y, id = @@id_default)
+    def initialize(name="NPC", pos_x=0, pos_y=0, id = @@id_default)
       @id=id
       @name=name
       @pos_x=pos_x
@@ -29,7 +29,7 @@ module NPC
   end
   class Enemy < Base
     attr_accessor :health, :damage, :map_marker
-    def initialize(name, pos_x, pos_y, damage, armor, health, inventory, dead, map_marker, image, id = @@id_default)
+    def initialize(name="Enemy", pos_x=0, pos_y=0, damage=5, armor=2, health=30, inventory=Inventory::Base.new, dead=false, map_marker="E", image="ASDF", id = @@id_default)
       super(name, pos_x, pos_y, id)
       @damage=damage
       @armor=armor
@@ -66,7 +66,7 @@ module NPC
   end
   class EnemyBoss < Base
     attr_accessor :health, :damage, :map_marker
-    def initialize(name, pos_x, pos_y, damage, armor, health, inventory, dead, map_marker, image, id = @@id_default)
+    def initialize(name="EnemyBoss", pos_x=0, pos_y=0, damage=20, armor=5, health=70, inventory=Inventory::Base.new, dead=false, map_marker="Đ", image="ASDF", id = @@id_default)
       super(name, pos_x, pos_y, id)
       @damage=damage
       @armor=armor
@@ -103,7 +103,7 @@ module NPC
   end
   class Shop < Base
     attr_reader :inventory
-    def initialize(name, pos_x, pos_y, inventory, id = @@id_default)
+    def initialize(name="Shop", pos_x=0, pos_y=0, inventory=Inventory::Base.new, id = @@id_default)
       super(name, pos_x, pos_y, id)
       @inventory = inventory
       @atts = ["Name: "+@name, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Inventory:\n"+@inventory.pretty_slots.to_s, "\nGold: "+@inventory.gold.to_s]
@@ -118,7 +118,7 @@ module NPC
 
     attr_accessor :quests
 
-    def initialize(name, pos_x, pos_y, quests, id = @@id_default)
+    def initialize(name="QuestGiver", pos_x=0, pos_y=0, quests=[], id = @@id_default)
       super(name, pos_x, pos_y, id)
       @quests = quests
       @atts = ["Name: "+@name.to_s, "X: "+@pos_x.to_s, "Y: "+@pos_y.to_s, "Id: "+@id.to_s, "Quests: "+@quests.to_s]
