@@ -140,6 +140,15 @@ describe 'Player::Base' do
     it 'takes damage' do
       expect(@player.health).to eq(70)
     end
+    context 'when damage kills you' do
+      before(:example) do
+        @player.take_damage(110)
+      end
+      it 'dies' do
+        expect(@player.health).to eq(0)
+        expect(@player.is_dead).to eq(true)
+      end
+    end
   end
 
   context 'when deal_damage' do
@@ -148,6 +157,17 @@ describe 'Player::Base' do
     end
     it 'takes damage' do
       expect(@player.deal_damage(@enemy)).to eq(3)
+    end
+    context 'when damage kills enemy' do
+      before(:example) do
+        @enemy=NPC::Enemy.new
+        @enemy.health=2
+        @player.deal_damage(@enemy)
+      end
+      it 'dies' do
+        expect(@enemy.health).to eq(0)
+        expect(@enemy.is_dead).to eq(true)
+      end
     end
   end
 
@@ -161,14 +181,6 @@ describe 'Player::Base' do
     end
   end
 
-  context 'when dead and check is_dead' do
-    before(:example) do
-      @player.take_damage(120)
-    end
-    it 'returns true' do
-      expect(@player.is_dead).to eq(true)
-    end
-  end
 
   context 'when add_ability' do
     before (:example) do

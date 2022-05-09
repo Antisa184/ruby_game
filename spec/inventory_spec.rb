@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe 'Inventory' do
   before do
-    @inventory=Inventory::Base.new
+    @inventory=Inventory::Base.new(max_slots=1)
     @item=Item::Base.new
   end
 
@@ -40,13 +40,22 @@ describe 'Inventory' do
         expect(@inventory.slots.size).to eq(0)
       end
     end
+    context 'when inventory full' do
+      before(:example) do
+        puts @inventory.max_slots
+        @inventory.item_add(@item)
+      end
+      it 'returns message' do
+        expect{@inventory.item_add(@item)}.to output("Inventory is full!\n").to_stdout
+      end
+    end
   end
 
   context 'when upgrade_slots' do
     before(:example) do
       @inventory.upgrade_slots(20)
     end
-    it 'decreases gold by 10' do
+    it 'increases number of slots' do
       expect(@inventory.max_slots).to eq(20)
     end
   end

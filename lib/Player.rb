@@ -110,9 +110,10 @@ module Player
     end
 
     def take_item (item)
-      @inventory.item_add(item)
-      @stats.items_collected+=1
-      @stats.items.append(item)
+      if @inventory.item_add(item)
+        @stats.items_collected+=1
+        @stats.items.append(item)
+      end
     end
 
     def use_item (item)

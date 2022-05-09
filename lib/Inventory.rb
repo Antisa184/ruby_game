@@ -51,7 +51,12 @@ module Inventory
       end
     end
     def item_add(item)
+      if @slots.size == @max_slots
+        puts "Inventory is full!"
+        return 0
+      end
       @slots.append(item)
+      return 1
     end
     def upgrade_slots(max_slots)
       @max_slots = max_slots
