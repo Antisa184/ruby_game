@@ -50,6 +50,11 @@ module Map
       pos_x=player.pos_x
       pos_y=player.pos_y
       map_marker=player.map_marker
+      #CHECK IF POSITION VALID
+      if not States::Base.inside_margin?(pos_x,pos_y)
+        puts "Player out of bounds!"
+        return 0
+      end
       #COUNT STEPS
       if pos_x!=@@prev_x or pos_y!=@@prev_y
         player.stats.steps+=1
@@ -91,6 +96,8 @@ module Map
         elsif object.is_a?(NPC::QuestGiver)
           @@map[pos_x][pos_y]="Q"
         end
+      else
+        puts("Position out of bounds!")
       end
     end
     def self.display(object)

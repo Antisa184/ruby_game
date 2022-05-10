@@ -24,7 +24,13 @@ describe 'Map' do
     end
   end
 
-  context 'when check_collision at 0,0' do
+  context 'when add_object Consumable to invalid position' do
+    it 'returns message' do
+      expect{Map::Base.add_object(Item::Consumable.new,-1,-1)}.to output("Position out of bounds!\n").to_stdout
+    end
+  end
+
+  context 'when check_collision with item' do
     before(:example) do
       Map::Base.add_object(Item::Consumable.new,0,0)
     end
@@ -41,4 +47,5 @@ describe 'Map' do
       expect(Map::Base.render(@player)[0][0]).to eq(@player.map_marker)
     end
   end
+
 end

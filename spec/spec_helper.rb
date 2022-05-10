@@ -767,6 +767,8 @@ module Map
         elsif object.is_a?(NPC::QuestGiver)
           @@map[pos_x][pos_y]="Q"
         end
+      else
+        puts("Position out of bounds!")
       end
     end
     def self.display(object)
