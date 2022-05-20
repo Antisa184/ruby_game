@@ -116,7 +116,7 @@ module NPC
   end
   class QuestGiver < Base
 
-    attr_accessor :quests
+    attr_reader :quests
 
     def initialize(name="QuestGiver", pos_x=0, pos_y=0, quests=[], id = @@id_default)
       super(name, pos_x, pos_y, id)

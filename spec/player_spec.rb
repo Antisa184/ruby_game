@@ -84,7 +84,7 @@ describe 'Player::Base' do
     context 'when req_lvl high' do
       before(:example) do
         @weapon_high=Item::Weapon.new
-        @weapon_high.req_lvl=3
+        @weapon_high.instance_variable_set(:@req_lvl, 3)
       end
       it 'returns message' do
         expect{@player.equip_weapon(@weapon_high)}.to output("You need to be level "+@weapon_high.req_lvl.to_s+" to use this weapon.\n").to_stdout

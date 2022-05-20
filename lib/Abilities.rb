@@ -1,7 +1,7 @@
 module Abilities
   class Base
-
-    attr_accessor :name, :damage, :command
+    attr_reader :name, :damage
+    attr_accessor :command
 
     def initialize(name="Ability", damage=1, command="Deal 5 damage")
       @name=name

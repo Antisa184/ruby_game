@@ -1,6 +1,6 @@
 module Quest
   class Base
-    attr_accessor :name, :description, :command, :reward_gold, :reward_xp, :kills, :killed, :gold_collected, :gold_spent, :items_collected, :items, :steps, :damage_dealt, :damage_taken, :healed, :xp_gained
+    attr_reader :name, :description, :gold_collected, :gold_spent, :items_collected, :items, :steps, :damage_dealt, :damage_taken, :healed, :xp_gained
     @@count=0
     @@id_default=1
     @@instances=[]

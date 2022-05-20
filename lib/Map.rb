@@ -11,6 +11,7 @@ module Map
     attr_reader :width, :height, :map
 
     def initialize(name="Map", width=4, height=4, objects=[], out=1, id = @@id_default)
+      @@map=["####","####","####","####"]
       @@id=id
       @@name=name
       @@width=width
@@ -31,6 +32,9 @@ module Map
       @@count
     end
     def self.entire_map
+      @@map
+    end
+    def get_map
       @@map
     end
     def self.width

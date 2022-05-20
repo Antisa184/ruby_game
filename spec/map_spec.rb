@@ -11,7 +11,7 @@ describe 'Map' do
       Map::Base.change_pixel(0,0,"P")
     end
     it 'changes pixel at 0,0 to P' do
-      expect(Map::Base.entire_map[0][0]).to eq("P")
+      expect(@map.get_map[0][0]).to eq("P")
     end
   end
 

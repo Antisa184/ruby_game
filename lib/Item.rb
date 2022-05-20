@@ -1,6 +1,6 @@
 module Item
   class Base
-    attr_accessor :id, :name, :description, :gold, :usable, :stackable, :count, :item_type, :rarity, :equipped
+    attr_reader :id, :name, :description, :gold, :usable, :stackable, :count, :item_type, :rarity, :equipped
     @@count=0
     @@id_default=1
     @@instances=[]
@@ -37,7 +37,7 @@ module Item
 
   class Weapon < Base
 
-    attr_accessor :id_default, :damage, :req_lvl
+    attr_reader :id_default, :damage, :req_lvl
 
     def attributes
       @atts
@@ -57,7 +57,7 @@ module Item
 
   class Consumable < Base
 
-    attr_accessor :id_default, :on_use
+    attr_reader :id_default, :on_use
 
     def attributes
       @atts
